@@ -2,40 +2,52 @@ package se.joscarsson.privify;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class FileListAdapter extends BaseAdapter {
     private Context context;
-    private File[] files;
-    private File parent;
+    private List<PrivifyFile> files;
+    private Set<PrivifyFile> selectedFiles;
+    private PrivifyFile currentDirectory;
 
     FileListAdapter(Context context) {
         this.context = context;
+        this.selectedFiles = new HashSet<>();
     }
 
     void openRootDirectory() {
-        this.openDirectory(new File("/sdcard"));
+        this.openDirectory(new PrivifyFile("/sdcard"));
     }
 
     boolean up() {
-        return this.openDirectory(this.parent.getParentFile());
+        return this.openDirectory(this.currentDirectory.getParent());
     }
 
-    private boolean openDirectory(File file) {
-        if (file.getAbsolutePath().equals("/")) return false;
-        this.parent = file;
-        this.files = file.listFiles();
+    List<PrivifyFile> getSelectedFiles() {
+        List<PrivifyFile> files = new ArrayList<>(this.selectedFiles);
+        Collections.sort(files);
+        return files;
+    }
+
+    private boolean openDirectory(PrivifyFile directory) {
+        if (directory.isRoot()) return false;
+        this.currentDirectory = directory;
+        this.files = directory.getFiles();
+        this.selectedFiles.clear();
         this.notifyDataSetChanged();
         return true;
     }
@@ -43,12 +55,12 @@ public class FileListAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         if (this.files == null) return 0;
-        return this.files.length;
+        return this.files.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return this.files[position];
+        return this.files.get(position);
     }
 
     @Override
@@ -65,11 +77,13 @@ public class FileListAdapter extends BaseAdapter {
             row = LayoutInflater.from(context).inflate(R.layout.file_row, parent, false);
         }
 
-        File file = this.files[position];
+        PrivifyFile file = this.files.get(position);
 
         CheckBox actionCheckBox = row.findViewById(R.id.actionCheckBox);
+        actionCheckBox.setEnabled(true);
         actionCheckBox.setChecked(false);
         actionCheckBox.jumpDrawablesToCurrentState();
+        actionCheckBox.setTag(file);
 
         TextView filenameTextView = row.findViewById(R.id.filenameTextView);
         filenameTextView.setText(file.getName());
@@ -78,11 +92,12 @@ public class FileListAdapter extends BaseAdapter {
         ImageView iconImageView = row.findViewById(R.id.iconImageView);
 
         if (file.isDirectory()) {
+            actionCheckBox.setEnabled(false);
             iconImageView.setImageResource(R.drawable.ic_folder_open_black);
             filenameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    File file = (File)v.getTag();
+                    PrivifyFile file = (PrivifyFile)v.getTag();
                     FileListAdapter.this.openDirectory(file);
                 }
             });
@@ -91,18 +106,29 @@ public class FileListAdapter extends BaseAdapter {
             filenameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String packageName = "se.joscarsson.privify.provider." + context.getApplicationContext().getPackageName();
-                    File file = (File)v.getTag();
-                    Uri fileUri = FileProvider.getUriForFile(FileListAdapter.this.context, packageName, file);
+                    PrivifyFile file = (PrivifyFile)v.getTag();
 
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent.setData(fileUri);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setData(file.getUri(FileListAdapter.this.context));
 
                     FileListAdapter.this.context.startActivity(intent);
                 }
             });
         }
+
+        actionCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton v, boolean isChecked) {
+                PrivifyFile file = (PrivifyFile)v.getTag();
+
+                if (isChecked) {
+                    FileListAdapter.this.selectedFiles.add(file);
+                } else {
+                    FileListAdapter.this.selectedFiles.remove(file);
+                }
+            }
+        });
 
         return row;
     }

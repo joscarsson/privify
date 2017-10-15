@@ -1,17 +1,20 @@
 package se.joscarsson.privify;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.View;
 
+import java.io.File;
+
 public class MainActivity extends ListActivity {
     private PassphraseVault vault;
+    private EncryptionEngine encryptionEngine;
     private FileListAdapter listAdapter;
     private boolean hasPermission;
 
@@ -23,12 +26,23 @@ public class MainActivity extends ListActivity {
         ensurePermission();
 
         View view = this.findViewById(R.id.activityMain);
+
+        FloatingActionButton actionButton = this.findViewById(R.id.actionButton);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.encryptionEngine.work();
+            }
+        });
+
         this.vault = new PassphraseVault(view);
 //        this.vault.collectPassphrase();
         this.vault.storePassphrase("abc");
 
         this.listAdapter = new FileListAdapter(this.getApplicationContext());
         setListAdapter(this.listAdapter);
+
+        this.encryptionEngine = new EncryptionEngine(this.listAdapter);
 
         if (this.hasPermission) {
             this.listAdapter.openRootDirectory();
