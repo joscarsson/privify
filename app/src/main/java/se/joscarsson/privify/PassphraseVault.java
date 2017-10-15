@@ -62,7 +62,7 @@ class PassphraseVault {
         });
     }
 
-    private Boolean storePassphrase(String passphrase) {
+    boolean storePassphrase(String passphrase) {
         String currentHash = this.preferences.getString("passphrase", null);
         String newHash = Cryptography.hash(passphrase);
 
