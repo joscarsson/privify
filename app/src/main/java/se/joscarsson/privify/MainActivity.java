@@ -10,10 +10,8 @@ import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.View;
 
-import java.io.File;
-
 public class MainActivity extends ListActivity {
-    private PassphraseVault vault;
+    private PassphraseVault passphraseVault;
     private EncryptionEngine encryptionEngine;
     private FileListAdapter listAdapter;
     private boolean hasPermission;
@@ -35,14 +33,14 @@ public class MainActivity extends ListActivity {
             }
         });
 
-        this.vault = new PassphraseVault(view);
-//        this.vault.collectPassphrase();
-        this.vault.storePassphrase("abc");
+        this.passphraseVault = new PassphraseVault(view);
+//        this.passphraseVault.collectPassphrase();
+        this.passphraseVault.storePassphrase("abc");
 
         this.listAdapter = new FileListAdapter(this.getApplicationContext());
         setListAdapter(this.listAdapter);
 
-        this.encryptionEngine = new EncryptionEngine(this.listAdapter);
+        this.encryptionEngine = new EncryptionEngine(this.listAdapter, this.passphraseVault.getPassphrase());
 
         if (this.hasPermission) {
             this.listAdapter.openRootDirectory();
@@ -71,8 +69,11 @@ public class MainActivity extends ListActivity {
     }
 
     private void ensurePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+        boolean readExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        boolean writeExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+
+        if (!readExternalStorage || !writeExternalStorage) {
+            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         } else {
             this.hasPermission = true;
         }

@@ -54,6 +54,17 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         return this.nativeFile.isDirectory();
     }
 
+    boolean isEncrypted() { return this.nativeFile.getName().endsWith(".pri"); }
+
+    String getEncryptedPath() {
+        return isEncrypted() ? this.nativeFile.getAbsolutePath() : this.nativeFile.getAbsolutePath() + ".pri";
+    }
+
+    String getPath() {
+        String path = this.nativeFile.getAbsolutePath();
+        return isEncrypted() ? path.substring(0, path.length() - 4) : path;
+    }
+
     @Override
     public int compareTo(@NonNull PrivifyFile o) {
         String thisName = this.nativeFile.getName();

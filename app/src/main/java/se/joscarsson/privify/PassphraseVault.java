@@ -79,4 +79,8 @@ class PassphraseVault {
 
         return true;
     }
+
+    String getPassphrase() {
+        return this.passphrase;
+    }
 }
