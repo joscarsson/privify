@@ -1,17 +1,17 @@
 package se.joscarsson.privify;
 
 import android.Manifest;
-import android.app.ListActivity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
+import android.widget.ListView;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends AppCompatActivity {
     private EncryptionEngine encryptionEngine;
     private FileListAdapter listAdapter;
     private boolean hasPermission;
@@ -19,16 +19,18 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
         View view = this.findViewById(R.id.activityMain);
+        ListView listView = this.findViewById(R.id.fileListView);
+        FloatingActionButton actionButton = this.findViewById(R.id.actionButton);
 
         ensurePermission();
 
         final PassphraseCollector passphraseCollector = new PassphraseCollector(view);
         passphraseCollector.collect();
 
-        FloatingActionButton actionButton = this.findViewById(R.id.actionButton);
+
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -37,7 +39,7 @@ public class MainActivity extends ListActivity {
         });
 
         this.listAdapter = new FileListAdapter(this.getApplicationContext());
-        setListAdapter(this.listAdapter);
+        listView.setAdapter(this.listAdapter);
 
         NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
         UserInterfaceHandler uiHandler = new UserInterfaceHandler(actionButton, this.listAdapter, notificationHelper);
