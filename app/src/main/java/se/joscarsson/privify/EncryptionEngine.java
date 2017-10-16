@@ -2,8 +2,10 @@ package se.joscarsson.privify;
 
 import android.util.Pair;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -83,6 +85,7 @@ class EncryptionEngine {
                         if (outputStream != null) outputStream.close();
                     }
 
+                    garbleFile(plainFile);
                     plainFile.delete();
                 } catch (Exception e) {
                     encryptedFile.delete(true);
@@ -117,6 +120,36 @@ class EncryptionEngine {
                 } catch (Exception e) {
                     plainFile.delete(true);
                     throw new RuntimeException(e);
+                }
+            }
+
+            /**
+             * Garbles the file by writing zeros to it. As the memory is of type Flash this does
+             * not guarantee that data gets fully overwritten (the driver might very well choose
+             * to write the garble data to other memory cells), but this at least makes recovery
+             * harder.
+             */
+            private void garbleFile(PrivifyFile file) throws IOException {
+                OutputStream outputStream = null;
+                long bytesToWrite = file.getSize();
+                long bytesWritten = 0;
+
+                if (bytesToWrite > 5*1024*1024) {
+                    bytesToWrite = (long)(bytesToWrite * 0.1);
+                }
+
+                Arrays.fill(buffer, (byte)0);
+
+                try {
+                    outputStream = file.getOutputStream();
+
+                    while (bytesWritten < bytesToWrite) {
+                        int len = bytesToWrite > buffer.length ? buffer.length : (int)bytesToWrite;
+                        outputStream.write(buffer, 0, len);
+                        bytesWritten += len;
+                    }
+                } finally {
+                    if (outputStream != null) outputStream.close();
                 }
             }
 
