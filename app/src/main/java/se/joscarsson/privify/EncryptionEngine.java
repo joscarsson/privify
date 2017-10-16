@@ -1,11 +1,11 @@
 package se.joscarsson.privify;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Pair;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -15,12 +15,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 
 class EncryptionEngine {
     private String passphrase;
+    private Context context;
     private FileListAdapter adapter;
+    private NotificationHelper notificationHelper;
     private Executor executor = Executors.newSingleThreadExecutor();
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -29,33 +30,48 @@ class EncryptionEngine {
         }
     };
 
-    EncryptionEngine(FileListAdapter adapter, String passphrase) {
+    EncryptionEngine(FileListAdapter adapter, String passphrase, NotificationHelper notificationHelper) {
         this.adapter = adapter;
         this.passphrase = passphrase;
+        this.notificationHelper = notificationHelper;
     }
 
     void work() {
         final List<PrivifyFile> files = this.adapter.getSelectedFiles();
 
+        this.notificationHelper.showEstimating();
+
         this.executor.execute(new Runnable() {
+            private byte[] buffer = new byte[1024*1024];
+            private long processedBytes = 0;
+            private long totalBytes = 0;
+            private boolean currentIsEncrypted;
+            private String currentName;
+
             @Override
             public void run() {
-                byte[] buffer = new byte[1024*1024];
+                for (PrivifyFile file : files) {
+                    this.totalBytes += file.getSize();
+                }
 
                 for (PrivifyFile file : files) {
-                    if (file.isEncrypted()) {
-                        decryptFile(file, buffer);
+                    this.currentName = file.getName();
+                    this.currentIsEncrypted = file.isEncrypted();
+
+                    if (this.currentIsEncrypted) {
+                        decryptFile(file);
                     } else {
-                        encryptFile(file, buffer);
+                        encryptFile(file);
                     }
                 }
 
+                EncryptionEngine.this.notificationHelper.hide();
                 EncryptionEngine.this.handler.sendEmptyMessage(0);
             }
 
-            private void encryptFile(PrivifyFile file, byte[] buffer) {
+            private void encryptFile(PrivifyFile file) {
                 try {
-                    FileInputStream inputStream = null;
+                    InputStream inputStream = null;
                     OutputStream outputStream = null;
 
                     Pair<Cipher, byte[]> cipherPair = Cryptography.newCipher(EncryptionEngine.this.passphrase);
@@ -72,41 +88,51 @@ class EncryptionEngine {
                         int bytesRead = inputStream.read(buffer);
                         while (bytesRead != -1) {
                             outputStream.write(buffer, 0, bytesRead);
+                            updateProgress(bytesRead);
                             bytesRead = inputStream.read(buffer);
                         }
                     } finally {
                         if (inputStream != null) inputStream.close();
                         if (outputStream != null) outputStream.close();
                     }
+
+                    file.delete();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
 
-            private void decryptFile(PrivifyFile file, byte[] buffer) {
+            private void decryptFile(PrivifyFile file) {
                 try {
                     InputStream inputStream = null;
-                    FileOutputStream outputStream = null;
+                    OutputStream outputStream = null;
 
                     try {
                         inputStream = new FileInputStream(file.getEncryptedPath());
-                        outputStream = new FileOutputStream(file.getPath() + ".test.pdf");
-
                         Cipher cipher = Cryptography.getCipher(EncryptionEngine.this.passphrase, inputStream);
-                        inputStream = new CipherInputStream(inputStream, cipher);
+                        outputStream = new CipherOutputStream(new FileOutputStream(file.getPath()), cipher);
 
                         int bytesRead = inputStream.read(buffer);
                         while (bytesRead != -1) {
                             outputStream.write(buffer, 0, bytesRead);
+                            updateProgress(bytesRead);
                             bytesRead = inputStream.read(buffer);
                         }
                     } finally {
                         if (inputStream != null) inputStream.close();
                         if (outputStream != null) outputStream.close();
                     }
+
+                    file.delete();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+            private void updateProgress(int bytesRead) {
+                processedBytes += bytesRead;
+                int progress = (int)(processedBytes * 100 / totalBytes);
+                EncryptionEngine.this.notificationHelper.showProcessing(progress, this.currentIsEncrypted, this.currentName);
             }
         });
     }

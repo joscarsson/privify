@@ -40,7 +40,8 @@ public class MainActivity extends ListActivity {
         this.listAdapter = new FileListAdapter(this.getApplicationContext());
         setListAdapter(this.listAdapter);
 
-        this.encryptionEngine = new EncryptionEngine(this.listAdapter, this.passphraseVault.getPassphrase());
+        NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+        this.encryptionEngine = new EncryptionEngine(this.listAdapter, this.passphraseVault.getPassphrase(), notificationHelper);
 
         if (this.hasPermission) {
             this.listAdapter.openRootDirectory();

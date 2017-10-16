@@ -1,5 +1,6 @@
 package se.joscarsson.privify;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,10 +48,15 @@ public class FileListAdapter extends BaseAdapter {
     private boolean openDirectory(PrivifyFile directory) {
         if (directory.isRoot()) return false;
         this.currentDirectory = directory;
-        this.files = directory.getFiles();
         this.selectedFiles.clear();
         this.notifyDataSetChanged();
         return true;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        this.files = this.currentDirectory.getFiles();
+        super.notifyDataSetChanged();
     }
 
     @Override
@@ -81,7 +88,7 @@ public class FileListAdapter extends BaseAdapter {
 
         CheckBox actionCheckBox = row.findViewById(R.id.actionCheckBox);
         actionCheckBox.setEnabled(true);
-        actionCheckBox.setChecked(false);
+        actionCheckBox.setChecked(this.selectedFiles.contains(file));
         actionCheckBox.jumpDrawablesToCurrentState();
         actionCheckBox.setTag(file);
 
@@ -102,7 +109,7 @@ public class FileListAdapter extends BaseAdapter {
                 }
             });
         } else {
-            iconImageView.setImageResource(R.drawable.ic_lock_open_black);
+            iconImageView.setImageResource(file.isEncrypted() ? R.drawable.ic_lock_black : R.drawable.ic_lock_open_black);
             filenameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -112,7 +119,11 @@ public class FileListAdapter extends BaseAdapter {
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.setData(file.getUri(FileListAdapter.this.context));
 
-                    FileListAdapter.this.context.startActivity(intent);
+                    try {
+                        FileListAdapter.this.context.startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(FileListAdapter.this.context, "Found no app capable of opening the selected file.", Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         }

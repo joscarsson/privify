@@ -38,7 +38,8 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
     }
 
     String getName() {
-        return this.nativeFile.getName();
+        String name = this.nativeFile.getName();
+        return isEncrypted() ? name.substring(0, name.length() - 4) : name;
     }
 
     Uri getUri(Context context) {
@@ -56,6 +57,11 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
 
     boolean isEncrypted() { return this.nativeFile.getName().endsWith(".pri"); }
 
+    void delete() {
+        boolean result = this.nativeFile.delete();
+        if (!result) throw new RuntimeException("Failed to delete file.");
+    }
+
     String getEncryptedPath() {
         return isEncrypted() ? this.nativeFile.getAbsolutePath() : this.nativeFile.getAbsolutePath() + ".pri";
     }
@@ -65,10 +71,25 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         return isEncrypted() ? path.substring(0, path.length() - 4) : path;
     }
 
+    long getSize() {
+        return this.nativeFile.length();
+    }
+
     @Override
     public int compareTo(@NonNull PrivifyFile o) {
         String thisName = this.nativeFile.getName();
         String otherName = o.nativeFile.getName();
         return thisName.compareToIgnoreCase(otherName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PrivifyFile) return this.compareTo((PrivifyFile)obj) == 0;
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.nativeFile.hashCode();
     }
 }
