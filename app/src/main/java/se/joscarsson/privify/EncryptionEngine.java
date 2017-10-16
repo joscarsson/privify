@@ -1,32 +1,26 @@
 package se.joscarsson.privify;
 
-import android.content.Context;
 import android.util.Pair;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 
 class EncryptionEngine {
-    private FileListAdapter adapter;
     private Executor executor = Executors.newSingleThreadExecutor();
     private UserInterfaceHandler uiHandler;
 
-    EncryptionEngine(FileListAdapter adapter, UserInterfaceHandler uiHandler) {
-        this.adapter = adapter;
+    EncryptionEngine(UserInterfaceHandler uiHandler) {
         this.uiHandler = uiHandler;
     }
 
-    void work(final String passphrase) {
-        final List<PrivifyFile> files = this.adapter.getSelectedFiles();
-
+    void work(final List<PrivifyFile> files, final String passphrase) {
         uiHandler.sendWorkBegun();
 
         this.executor.execute(new Runnable() {
@@ -38,25 +32,31 @@ class EncryptionEngine {
 
             @Override
             public void run() {
-                for (PrivifyFile file : files) {
-                    this.totalBytes += file.getSize();
-                }
-
-                for (PrivifyFile file : files) {
-                    this.currentName = file.getName();
-                    this.currentIsEncrypted = file.isEncrypted();
-
-                    if (this.currentIsEncrypted) {
-                        decryptFile(file);
-                    } else {
-                        encryptFile(file);
+                try {
+                    for (PrivifyFile file : files) {
+                        this.totalBytes += file.getSize();
                     }
-                }
 
-                EncryptionEngine.this.uiHandler.sendWorkDone();
+                    for (PrivifyFile file : files) {
+                        this.currentName = file.getName();
+                        this.currentIsEncrypted = file.isEncrypted();
+
+                        if (this.currentIsEncrypted) {
+                            decryptFile(file);
+                        } else {
+                            encryptFile(file);
+                        }
+                    }
+
+                    EncryptionEngine.this.uiHandler.sendWorkDone();
+                } catch (Exception e) {
+                    EncryptionEngine.this.uiHandler.sendWorkError();
+                }
             }
 
-            private void encryptFile(PrivifyFile file) {
+            private void encryptFile(PrivifyFile plainFile) throws BadPaddingException {
+                PrivifyFile encryptedFile = new PrivifyFile(plainFile.getEncryptedPath());
+
                 try {
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
@@ -66,8 +66,8 @@ class EncryptionEngine {
                     byte[] header = cipherPair.second;
 
                     try {
-                        inputStream = new FileInputStream(file.getPath());
-                        outputStream = new FileOutputStream(file.getEncryptedPath());
+                        inputStream = plainFile.getInputStream();
+                        outputStream = encryptedFile.getOutputStream();
 
                         outputStream.write(header);
                         outputStream = new CipherOutputStream(outputStream, cipher);
@@ -83,21 +83,24 @@ class EncryptionEngine {
                         if (outputStream != null) outputStream.close();
                     }
 
-                    file.delete();
+                    plainFile.delete();
                 } catch (Exception e) {
+                    encryptedFile.delete(true);
                     throw new RuntimeException(e);
                 }
             }
 
-            private void decryptFile(PrivifyFile file) {
+            private void decryptFile(PrivifyFile encryptedFile) throws BadPaddingException {
+                PrivifyFile plainFile = new PrivifyFile(encryptedFile.getPath());
+
                 try {
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
 
                     try {
-                        inputStream = new FileInputStream(file.getEncryptedPath());
+                        inputStream = encryptedFile.getInputStream();
                         Cipher cipher = Cryptography.getCipher(passphrase, inputStream);
-                        outputStream = new CipherOutputStream(new FileOutputStream(file.getPath()), cipher);
+                        outputStream = new CipherOutputStream(plainFile.getOutputStream(), cipher);
 
                         int bytesRead = inputStream.read(buffer);
                         while (bytesRead != -1) {
@@ -110,8 +113,9 @@ class EncryptionEngine {
                         if (outputStream != null) outputStream.close();
                     }
 
-                    file.delete();
+                    encryptedFile.delete();
                 } catch (Exception e) {
+                    plainFile.delete(true);
                     throw new RuntimeException(e);
                 }
             }
