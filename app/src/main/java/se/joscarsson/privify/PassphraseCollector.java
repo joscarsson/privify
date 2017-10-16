@@ -20,6 +20,10 @@ class PassphraseCollector {
         this.preferences = this.context.getSharedPreferences("privify", Context.MODE_PRIVATE);
     }
 
+    void dev() {
+        storePassphrase("cde");
+    }
+
     void collect() {
         this.view.post(new Runnable() {
             public void run() {

@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +61,12 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
     boolean isEncrypted() { return this.nativeFile.getName().endsWith(".pri"); }
 
     void delete() {
+        this.delete(false);
+    }
+
+    void delete(boolean ignoreError) {
         boolean result = this.nativeFile.delete();
-        if (!result) throw new RuntimeException("Failed to delete file.");
+        if (!result && !ignoreError) throw new RuntimeException("Failed to delete file.");
     }
 
     String getEncryptedPath() {
@@ -69,6 +76,14 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
     String getPath() {
         String path = this.nativeFile.getAbsolutePath();
         return isEncrypted() ? path.substring(0, path.length() - 4) : path;
+    }
+
+    FileOutputStream getOutputStream() throws FileNotFoundException {
+        return new FileOutputStream(this.nativeFile);
+    }
+
+    FileInputStream getInputStream() throws FileNotFoundException {
+        return new FileInputStream(this.nativeFile);
     }
 
     long getSize() {

@@ -45,7 +45,7 @@ public class FileListAdapter extends BaseAdapter {
         return files;
     }
 
-    private boolean openDirectory(PrivifyFile directory) {
+    boolean openDirectory(PrivifyFile directory) {
         if (directory.isRoot()) return false;
         this.currentDirectory = directory;
         this.selectedFiles.clear();
@@ -77,62 +77,34 @@ public class FileListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final AbsListView listView = (AbsListView)parent;
         View row = convertView;
 
         if (convertView == null) {
             row = LayoutInflater.from(context).inflate(R.layout.file_row, parent, false);
         }
 
-        PrivifyFile file = this.files.get(position);
+        final PrivifyFile file = this.files.get(position);
+        row.setTag(file);
 
         CheckBox actionCheckBox = row.findViewById(R.id.actionCheckBox);
         actionCheckBox.setEnabled(true);
         actionCheckBox.setChecked(this.selectedFiles.contains(file));
-        actionCheckBox.jumpDrawablesToCurrentState();
-        actionCheckBox.setTag(file);
 
         TextView filenameTextView = row.findViewById(R.id.filenameTextView);
         filenameTextView.setText(file.getName());
-        filenameTextView.setTag(file);
 
         ImageView iconImageView = row.findViewById(R.id.iconImageView);
 
         if (file.isDirectory()) {
             actionCheckBox.setEnabled(false);
             iconImageView.setImageResource(R.drawable.ic_folder_open_black);
-            filenameTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PrivifyFile file = (PrivifyFile)v.getTag();
-                    FileListAdapter.this.openDirectory(file);
-                }
-            });
         } else {
             iconImageView.setImageResource(file.isEncrypted() ? R.drawable.ic_lock_black : R.drawable.ic_lock_open_black);
-            filenameTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PrivifyFile file = (PrivifyFile)v.getTag();
-
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.setData(file.getUri(FileListAdapter.this.context));
-
-                    try {
-                        FileListAdapter.this.context.startActivity(intent);
-                    } catch (ActivityNotFoundException e) {
-                        Toast.makeText(FileListAdapter.this.context, "Found no app capable of opening the selected file.", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
         }
 
         actionCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton v, boolean isChecked) {
-                PrivifyFile file = (PrivifyFile)v.getTag();
-
                 if (isChecked) {
                     FileListAdapter.this.selectedFiles.add(file);
                 } else {
@@ -140,6 +112,8 @@ public class FileListAdapter extends BaseAdapter {
                 }
             }
         });
+
+        parent.jumpDrawablesToCurrentState();
 
         return row;
     }
