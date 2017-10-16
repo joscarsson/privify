@@ -8,22 +8,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-class PassphraseVault {
+class PassphraseCollector {
     private View view;
     private Context context;
     private SharedPreferences preferences;
     private String passphrase;
 
-    PassphraseVault(View view) {
+    PassphraseCollector(View view) {
         this.view = view;
         this.context = view.getContext();
         this.preferences = this.context.getSharedPreferences("privify", Context.MODE_PRIVATE);
     }
 
-    void collectPassphrase() {
+    void collect() {
         this.view.post(new Runnable() {
             public void run() {
-                AlertDialog popupDialog = new AlertDialog.Builder(PassphraseVault.this.context)
+                AlertDialog popupDialog = new AlertDialog.Builder(PassphraseCollector.this.context)
                         .setTitle("Input passphrase")
                         .setCancelable(false)
                         .setView(R.layout.passphrase_popup)
@@ -62,7 +62,7 @@ class PassphraseVault {
         });
     }
 
-    boolean storePassphrase(String passphrase) {
+    private boolean storePassphrase(String passphrase) {
         String currentHash = this.preferences.getString("passphrase", null);
         String newHash = Cryptography.hash(passphrase);
 

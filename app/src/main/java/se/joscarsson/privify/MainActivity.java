@@ -9,9 +9,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 
 public class MainActivity extends ListActivity {
-    private PassphraseVault passphraseVault;
     private EncryptionEngine encryptionEngine;
     private FileListAdapter listAdapter;
     private boolean hasPermission;
@@ -19,29 +19,30 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+        View view = this.findViewById(R.id.activityMain);
 
         ensurePermission();
 
-        View view = this.findViewById(R.id.activityMain);
+        final PassphraseCollector passphraseCollector = new PassphraseCollector(view);
+        passphraseCollector.collect();
 
         FloatingActionButton actionButton = this.findViewById(R.id.actionButton);
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.this.encryptionEngine.work();
+                MainActivity.this.encryptionEngine.work(passphraseCollector.getPassphrase());
             }
         });
-
-        this.passphraseVault = new PassphraseVault(view);
-//        this.passphraseVault.collectPassphrase();
-        this.passphraseVault.storePassphrase("abc");
 
         this.listAdapter = new FileListAdapter(this.getApplicationContext());
         setListAdapter(this.listAdapter);
 
         NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-        this.encryptionEngine = new EncryptionEngine(this.listAdapter, this.passphraseVault.getPassphrase(), notificationHelper);
+        UserInterfaceHandler uiHandler = new UserInterfaceHandler(actionButton, this.listAdapter, notificationHelper);
+
+        this.encryptionEngine = new EncryptionEngine(this.listAdapter, uiHandler);
 
         if (this.hasPermission) {
             this.listAdapter.openRootDirectory();

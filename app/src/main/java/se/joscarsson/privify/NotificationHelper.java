@@ -11,7 +11,7 @@ class NotificationHelper {
     NotificationHelper(Context context) {
         this.manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.builder = new NotificationCompat.Builder(context, "privify_progress")
-                .setSmallIcon(R.drawable.ic_hourglass_empty_black)
+                .setSmallIcon(R.drawable.ic_lock_white)
                 .setOngoing(true);
     }
 

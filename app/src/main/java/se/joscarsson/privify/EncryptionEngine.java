@@ -1,9 +1,6 @@
 package se.joscarsson.privify;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Pair;
 
 import java.io.FileInputStream;
@@ -18,28 +15,19 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 
 class EncryptionEngine {
-    private String passphrase;
-    private Context context;
     private FileListAdapter adapter;
-    private NotificationHelper notificationHelper;
     private Executor executor = Executors.newSingleThreadExecutor();
-    private Handler handler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            EncryptionEngine.this.adapter.notifyDataSetChanged();
-        }
-    };
+    private UserInterfaceHandler uiHandler;
 
-    EncryptionEngine(FileListAdapter adapter, String passphrase, NotificationHelper notificationHelper) {
+    EncryptionEngine(FileListAdapter adapter, UserInterfaceHandler uiHandler) {
         this.adapter = adapter;
-        this.passphrase = passphrase;
-        this.notificationHelper = notificationHelper;
+        this.uiHandler = uiHandler;
     }
 
-    void work() {
+    void work(final String passphrase) {
         final List<PrivifyFile> files = this.adapter.getSelectedFiles();
 
-        this.notificationHelper.showEstimating();
+        uiHandler.sendWorkBegun();
 
         this.executor.execute(new Runnable() {
             private byte[] buffer = new byte[1024*1024];
@@ -65,8 +53,7 @@ class EncryptionEngine {
                     }
                 }
 
-                EncryptionEngine.this.notificationHelper.hide();
-                EncryptionEngine.this.handler.sendEmptyMessage(0);
+                EncryptionEngine.this.uiHandler.sendWorkDone();
             }
 
             private void encryptFile(PrivifyFile file) {
@@ -74,7 +61,7 @@ class EncryptionEngine {
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
 
-                    Pair<Cipher, byte[]> cipherPair = Cryptography.newCipher(EncryptionEngine.this.passphrase);
+                    Pair<Cipher, byte[]> cipherPair = Cryptography.newCipher(passphrase);
                     Cipher cipher = cipherPair.first;
                     byte[] header = cipherPair.second;
 
@@ -109,7 +96,7 @@ class EncryptionEngine {
 
                     try {
                         inputStream = new FileInputStream(file.getEncryptedPath());
-                        Cipher cipher = Cryptography.getCipher(EncryptionEngine.this.passphrase, inputStream);
+                        Cipher cipher = Cryptography.getCipher(passphrase, inputStream);
                         outputStream = new CipherOutputStream(new FileOutputStream(file.getPath()), cipher);
 
                         int bytesRead = inputStream.read(buffer);
@@ -132,7 +119,7 @@ class EncryptionEngine {
             private void updateProgress(int bytesRead) {
                 processedBytes += bytesRead;
                 int progress = (int)(processedBytes * 100 / totalBytes);
-                EncryptionEngine.this.notificationHelper.showProcessing(progress, this.currentIsEncrypted, this.currentName);
+                EncryptionEngine.this.uiHandler.sendProgressUpdate(this.currentIsEncrypted, this.currentName, progress);
             }
         });
     }
