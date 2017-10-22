@@ -32,7 +32,7 @@ class PassphraseCollector {
                         .setCancelable(false)
                         .setView(R.layout.passphrase_popup)
                         .setPositiveButton(android.R.string.ok, null)
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 System.exit(0);
