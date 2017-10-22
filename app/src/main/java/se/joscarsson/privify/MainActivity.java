@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SwipeRefreshLayout refreshLayout;
     private ListView listView;
     private Deque<Pair<Integer, Integer>> scrollPositions;
-    private boolean hasPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.listView.setEmptyView(this.findViewById(R.id.emptyTextView));
         this.refreshLayout.setOnRefreshListener(this);
 
-        ensurePermission();
+        boolean hasPermission = ensurePermission();
 
         this.notificationHelper = new NotificationHelper(getApplicationContext());
         UserInterfaceHandler uiHandler = new UserInterfaceHandler(actionButton, this.listAdapter, notificationHelper);
@@ -57,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.passphraseCollector = new PassphraseCollector(view);
         passphraseCollector.collect();
 
-        if (this.hasPermission) {
+        if (hasPermission) {
             this.listAdapter.openRootDirectory();
         }
     }
@@ -116,14 +115,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.listAdapter.openRootDirectory();
     }
 
-    private void ensurePermission() {
+    private boolean ensurePermission() {
         boolean readExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         boolean writeExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
         if (!readExternalStorage || !writeExternalStorage) {
             requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+            return false;
         } else {
-            this.hasPermission = true;
+            return true;
         }
     }
 
