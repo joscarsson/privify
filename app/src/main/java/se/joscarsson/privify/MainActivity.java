@@ -18,14 +18,16 @@ import android.widget.ListView;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, OnSelectionChangeListener {
     private PassphraseCollector passphraseCollector;
     private EncryptionEngine encryptionEngine;
     private FileListAdapter listAdapter;
     private NotificationHelper notificationHelper;
     private SwipeRefreshLayout refreshLayout;
     private ListView listView;
+    private FloatingActionButton actionButton;
     private Deque<Pair<Integer, Integer>> scrollPositions;
 
     @Override
@@ -34,12 +36,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         View view = this.findViewById(R.id.activityMain);
-        FloatingActionButton actionButton = this.findViewById(R.id.actionButton);
+        this.actionButton = this.findViewById(R.id.actionButton);
         this.listView = this.findViewById(R.id.fileListView);
         this.refreshLayout = this.findViewById(R.id.refreshLayout);
 
         this.scrollPositions = new ArrayDeque<>();
-        this.listAdapter = new FileListAdapter(this.getApplicationContext());
+        this.listAdapter = new FileListAdapter(this.getApplicationContext(), this);
 
         actionButton.setOnClickListener(this);
         this.listView.setOnItemClickListener(this);
@@ -102,6 +104,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRefresh() {
         this.listAdapter.notifyDataSetChanged();
         this.refreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onSelectionChanged(List<PrivifyFile> selectedFiles) {
+        boolean onlyEncrypted = true;
+
+        for (PrivifyFile f : selectedFiles) {
+            if (!f.isEncrypted()) {
+                onlyEncrypted = false;
+                break;
+            }
+        }
+
+        if (onlyEncrypted && !selectedFiles.isEmpty()) {
+            this.actionButton.setImageResource(R.drawable.ic_lock_open_white);
+        } else {
+            this.actionButton.setImageResource(R.drawable.ic_lock_white);
+        }
     }
 
     @Override

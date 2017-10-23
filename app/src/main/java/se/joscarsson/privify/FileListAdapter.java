@@ -1,18 +1,14 @@
 package se.joscarsson.privify;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +21,11 @@ public class FileListAdapter extends BaseAdapter {
     private List<PrivifyFile> files;
     private Set<PrivifyFile> selectedFiles;
     private PrivifyFile currentDirectory;
+    private OnSelectionChangeListener listener;
 
-    FileListAdapter(Context context) {
+    FileListAdapter(Context context, OnSelectionChangeListener listener) {
         this.context = context;
+        this.listener = listener;
         this.selectedFiles = new HashSet<>();
     }
 
@@ -76,7 +74,7 @@ public class FileListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         View row = convertView;
 
         if (convertView == null) {
@@ -110,6 +108,7 @@ public class FileListAdapter extends BaseAdapter {
                 } else {
                     FileListAdapter.this.selectedFiles.remove(file);
                 }
+                FileListAdapter.this.listener.onSelectionChanged(new ArrayList<>(FileListAdapter.this.selectedFiles));
             }
         });
 
