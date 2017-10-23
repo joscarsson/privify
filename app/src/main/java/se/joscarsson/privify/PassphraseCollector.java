@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,15 +69,17 @@ class PassphraseCollector {
 
     private boolean storePassphrase(String passphrase) {
         String currentHash = this.preferences.getString("passphrase", null);
-        String newHash = Cryptography.hash(passphrase);
+        String salt = this.preferences.getString("salt", null);
+        Pair<String, String> newHash = Cryptography.hash(passphrase, salt);
 
-        if (currentHash != null && !currentHash.equals(newHash)) {
+        if (currentHash != null && !currentHash.equals(newHash.first)) {
             return false;
         }
 
         this.preferences
                 .edit()
-                .putString("passphrase", newHash)
+                .putString("passphrase", newHash.first)
+                .putString("salt", newHash.second)
                 .commit();
 
         this.passphrase = passphrase;

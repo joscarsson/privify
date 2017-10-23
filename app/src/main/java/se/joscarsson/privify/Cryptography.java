@@ -23,19 +23,24 @@ class Cryptography {
     private static final int SALT_LENGTH = KEY_LENGTH / 8;
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    static String hash(String value) {
-        MessageDigest digest;
-
+    static Pair<String, String> hash(String value, String hexSalt)
+    {
         try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
+            byte[] salt = new byte[16];
+
+            if (hexSalt == null) {
+                RANDOM.nextBytes(salt);
+            } else {
+                salt = toBytes(hexSalt);
+            }
+
+            KeySpec keySpecification = new PBEKeySpec(value.toCharArray(), salt, ITERATION_MULTIPLIER * 1000, KEY_LENGTH);
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            byte[] hashBytes = keyFactory.generateSecret(keySpecification).getEncoded();
+            return new Pair<>(toHex(hashBytes), toHex(salt));
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        digest.reset();
-        byte[] hashBytes = digest.digest(value.getBytes());
-
-        return String.format("%0" + (hashBytes.length * 2) + "X", new BigInteger(1, hashBytes));
     }
 
     static Pair<Cipher, byte[]> newCipher(String passphrase) {
@@ -44,11 +49,11 @@ class Cryptography {
         byte[] salt = new byte[SALT_LENGTH];
         RANDOM.nextBytes(salt);
 
-        KeySpec keySpec = new PBEKeySpec(passphrase.toCharArray(), salt, ITERATION_MULTIPLIER * 1000, KEY_LENGTH);
+        KeySpec keySpecification = new PBEKeySpec(passphrase.toCharArray(), salt, ITERATION_MULTIPLIER * 1000, KEY_LENGTH);
 
         try {
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            byte[] keyBytes = keyFactory.generateSecret(keySpec).getEncoded();
+            byte[] keyBytes = keyFactory.generateSecret(keySpecification).getEncoded();
             SecretKey key = new SecretKeySpec(keyBytes, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -86,10 +91,10 @@ class Cryptography {
             }
 
             int iterationCount = iterationMultipler * 1000;
-            KeySpec keySpec = new PBEKeySpec(passphrase.toCharArray(), salt, iterationCount, KEY_LENGTH);
+            KeySpec keySpecification = new PBEKeySpec(passphrase.toCharArray(), salt, iterationCount, KEY_LENGTH);
 
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            byte[] keyBytes = keyFactory.generateSecret(keySpec).getEncoded();
+            byte[] keyBytes = keyFactory.generateSecret(keySpecification).getEncoded();
             SecretKey key = new SecretKeySpec(keyBytes, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -99,5 +104,17 @@ class Cryptography {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String toHex(byte[] values) {
+        return String.format("%0" + (values.length * 2) + "X", new BigInteger(1, values));
+    }
+
+    private static byte[] toBytes(String hex) {
+        byte[] data = new byte[hex.length() / 2];
+        for (int i = 0; i < hex.length(); i += 2) {
+            data[i / 2] = (byte)(Character.digit(hex.charAt(i), 16) * 16 + Character.digit(hex.charAt(i+1), 16));
+        }
+        return data;
     }
 }
