@@ -107,4 +107,18 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
     public int hashCode() {
         return this.nativeFile.hashCode();
     }
+
+    static List<PrivifyFile> expandDirectories(List<PrivifyFile> files) {
+        List<PrivifyFile> expandedFiles = new ArrayList<>();
+
+        for (final PrivifyFile file : files) {
+            if (file.isDirectory()) {
+                expandedFiles.addAll(expandDirectories(file.getFiles()));
+            } else {
+                expandedFiles.add(file);
+            }
+        }
+
+        return expandedFiles;
+    }
 }

@@ -35,11 +35,13 @@ class EncryptionEngine {
             @Override
             public void run() {
                 try {
-                    for (PrivifyFile file : files) {
+                    List<PrivifyFile> expandedFiles = PrivifyFile.expandDirectories(files);
+
+                    for (PrivifyFile file : expandedFiles) {
                         this.totalBytes += file.getSize();
                     }
 
-                    for (PrivifyFile file : files) {
+                    for (PrivifyFile file : expandedFiles) {
                         this.currentName = file.getName();
                         this.currentIsEncrypted = file.isEncrypted();
 

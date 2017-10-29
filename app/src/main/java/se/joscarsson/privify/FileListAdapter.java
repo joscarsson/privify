@@ -54,6 +54,7 @@ public class FileListAdapter extends BaseAdapter {
     @Override
     public void notifyDataSetChanged() {
         this.files = this.currentDirectory.getFiles();
+        this.selectedFiles.clear();
         super.notifyDataSetChanged();
     }
 
@@ -85,21 +86,8 @@ public class FileListAdapter extends BaseAdapter {
         row.setTag(file);
 
         CheckBox actionCheckBox = row.findViewById(R.id.actionCheckBox);
-        actionCheckBox.setEnabled(true);
+        actionCheckBox.setOnCheckedChangeListener(null);
         actionCheckBox.setChecked(this.selectedFiles.contains(file));
-
-        TextView filenameTextView = row.findViewById(R.id.filenameTextView);
-        filenameTextView.setText(file.getName());
-
-        ImageView iconImageView = row.findViewById(R.id.iconImageView);
-
-        if (file.isDirectory()) {
-            actionCheckBox.setEnabled(false);
-            iconImageView.setImageResource(R.drawable.ic_folder_open_black);
-        } else {
-            iconImageView.setImageResource(file.isEncrypted() ? R.drawable.ic_lock_black : R.drawable.ic_lock_open_black);
-        }
-
         actionCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton v, boolean isChecked) {
@@ -112,8 +100,17 @@ public class FileListAdapter extends BaseAdapter {
             }
         });
 
-        parent.jumpDrawablesToCurrentState();
+        TextView filenameTextView = row.findViewById(R.id.filenameTextView);
+        filenameTextView.setText(file.getName());
 
+        ImageView iconImageView = row.findViewById(R.id.iconImageView);
+        if (file.isDirectory()) {
+            iconImageView.setImageResource(R.drawable.ic_folder_open_black);
+        } else {
+            iconImageView.setImageResource(file.isEncrypted() ? R.drawable.ic_lock_black : R.drawable.ic_lock_open_black);
+        }
+
+        parent.jumpDrawablesToCurrentState();
         return row;
     }
 }
