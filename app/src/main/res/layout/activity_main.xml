@@ -6,59 +6,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
-    <android.support.design.widget.CoordinatorLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/activityMain"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/activityMain"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context="se.joscarsson.privify.MainActivity">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                android:elevation="4dp"
-                app:titleTextColor="@color/primaryTextColor" />
-            <RelativeLayout
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            app:titleTextColor="@color/primaryTextColor" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/refreshLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <android.support.v4.widget.SwipeRefreshLayout
-                    android:id="@+id/refreshLayout"
+                <ListView
+                    android:id="@+id/fileListView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                        <ListView
-                            android:id="@+id/fileListView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
-                </android.support.v4.widget.SwipeRefreshLayout>
-                <TextView
-                    android:id="@+id/emptyTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="This folder is empty."
-                    android:textSize="18sp"
-                    android:visibility="gone" />
-            </RelativeLayout>
-        </LinearLayout>
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/actionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="32dp"
-            android:src="@drawable/ic_lock_white"
-            android:backgroundTint="@color/action_button"
-            android:backgroundTintMode="src_over"
-            app:fabSize="normal"
-            app:borderWidth="0dp"/>
-    </android.support.design.widget.CoordinatorLayout>
+                    android:layout_height="match_parent" />
+            </android.support.v4.widget.SwipeRefreshLayout>
+            <TextView
+                android:id="@+id/emptyTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="This folder is empty."
+                android:textSize="18sp"
+                android:visibility="gone" />
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/actionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="32dp"
+                android:src="@drawable/ic_lock_white"
+                android:backgroundTint="@color/action_button"
+                android:backgroundTintMode="src_over"
+                app:fabSize="normal"
+                app:borderWidth="0dp"/>
+        </RelativeLayout>
+    </LinearLayout>
     <android.support.design.widget.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
