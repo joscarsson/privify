@@ -25,7 +25,8 @@ class PassphraseCollector {
         storePassphrase("cde");
     }
 
-    void collect() {
+    void ensurePassphrase() {
+        if (this.passphrase != null) return;
         this.view.post(new Runnable() {
             public void run() {
                 AlertDialog popupDialog = new AlertDialog.Builder(PassphraseCollector.this.context)
@@ -89,5 +90,9 @@ class PassphraseCollector {
 
     String getPassphrase() {
         return this.passphrase;
+    }
+
+    void clearPassphrase() {
+        this.passphrase = null;
     }
 }

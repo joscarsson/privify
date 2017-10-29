@@ -2,7 +2,10 @@ package se.joscarsson.privify;
 
 import android.Manifest;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +14,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Pair;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -19,6 +21,8 @@ import android.widget.ListView;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+
+import static se.joscarsson.privify.PrivifyApplication.INTENT_LOCK_ACTION;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, OnSelectionChangeListener {
     private PassphraseCollector passphraseCollector;
@@ -29,6 +33,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private ListView listView;
     private FloatingActionButton actionButton;
     private Deque<Pair<Integer, Integer>> scrollPositions;
+    private BroadcastReceiver lockBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MainActivity.this.passphraseCollector.clearPassphrase();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +67,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         this.encryptionEngine = new EncryptionEngine(uiHandler);
         this.passphraseCollector = new PassphraseCollector(view);
-//        passphraseCollector.collect();
-        passphraseCollector.dev();
 
         if (hasPermission) {
             this.listAdapter.openRootDirectory();
         }
+
+        registerReceiver(this.lockBroadcastReceiver, new IntentFilter(INTENT_LOCK_ACTION));
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(this.lockBroadcastReceiver);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        this.passphraseCollector.dev();
+        this.passphraseCollector.ensurePassphrase();
     }
 
     @Override
