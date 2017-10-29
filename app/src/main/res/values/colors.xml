@@ -9,4 +9,5 @@
   <color name="primaryTextColor">#ffffff</color>
   <color name="secondaryTextColor">#ffffff</color>
   <color name="lightGray">#cccccc</color>
+  <color name="lighterGray">#dddddd</color>
 </resources>

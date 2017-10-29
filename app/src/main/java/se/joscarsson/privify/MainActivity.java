@@ -50,12 +50,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.refreshLayout = this.findViewById(R.id.refreshLayout);
         this.drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
 
-        navigationView.setCheckedItem(0);
+        navigationView.getMenu().getItem(0).setChecked(true);
 
         this.drawerToggle.setDrawerIndicatorEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_lock_white);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white);
 
         this.scrollPositions = new ArrayDeque<>();
         this.listAdapter = new FileListAdapter(this, this);

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:icon="@drawable/ic_sd_storage_black"
-        android:title="Storage" />
-    <item
-        android:icon="@drawable/ic_settings_black"
-        android:title="Settings" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/storageMenuItem"
+            android:icon="@drawable/ic_sd_storage_black"
+            android:title="Storage" />
+        <item
+            android:id="@+id/settingsMenuItem"
+            android:icon="@drawable/ic_settings_black"
+            android:title="Settings" />
+    </group>
 </menu>
