@@ -59,19 +59,16 @@ public class UserInterfaceHandler extends Handler {
         if (msg.what == MESSAGE_WORK_BEGUN) {
             this.button.setEnabled(false);
             this.button.setImageResource(R.drawable.ic_hourglass_full_white);
-            this.button.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
             this.notificationHelper.showEstimating();
         } else if (msg.what == MESSAGE_WORK_DONE) {
             this.adapter.notifyDataSetChanged();
             this.button.setEnabled(true);
             this.button.setImageResource(R.drawable.ic_lock_white);
-            this.button.setBackgroundTintList(ColorStateList.valueOf(this.context.getColor(R.color.colorAccent)));
             this.notificationHelper.hide();
         } else if (msg.what == MESSAGE_WORK_ERROR) {
             this.adapter.notifyDataSetChanged();
             this.button.setEnabled(true);
             this.button.setImageResource(R.drawable.ic_lock_white);
-            this.button.setBackgroundTintList(ColorStateList.valueOf(this.context.getColor(R.color.colorAccent)));
             this.notificationHelper.showError();
         } else if (msg.what == MESSAGE_PROGRESS_UPDATE) {
             int progress = msg.getData().getInt("progress");

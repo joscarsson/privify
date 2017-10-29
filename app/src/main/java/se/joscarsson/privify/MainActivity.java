@@ -7,11 +7,16 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -26,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FileListAdapter listAdapter;
     private NotificationHelper notificationHelper;
     private SwipeRefreshLayout refreshLayout;
+    private ActionBarDrawerToggle drawerToggle;
     private ListView listView;
     private FloatingActionButton actionButton;
     private Deque<Pair<Integer, Integer>> scrollPositions;
@@ -34,14 +40,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
 
         View view = this.findViewById(R.id.activityMain);
+        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
+        NavigationView navigationView = findViewById(R.id.navigationView);
         this.actionButton = this.findViewById(R.id.actionButton);
         this.listView = this.findViewById(R.id.fileListView);
         this.refreshLayout = this.findViewById(R.id.refreshLayout);
+        this.drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+
+        navigationView.setCheckedItem(0);
+
+        this.drawerToggle.setDrawerIndicatorEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_lock_white);
 
         this.scrollPositions = new ArrayDeque<>();
-        this.listAdapter = new FileListAdapter(this.getApplicationContext(), this);
+        this.listAdapter = new FileListAdapter(this, this);
 
         actionButton.setOnClickListener(this);
         this.listView.setOnItemClickListener(this);
@@ -51,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         boolean hasPermission = ensurePermission();
 
-        this.notificationHelper = new NotificationHelper(getApplicationContext());
+        this.notificationHelper = new NotificationHelper(this);
         UserInterfaceHandler uiHandler = new UserInterfaceHandler(actionButton, this.listAdapter, notificationHelper);
 
         this.encryptionEngine = new EncryptionEngine(uiHandler);
@@ -107,6 +124,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return this.drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onSelectionChanged(List<PrivifyFile> selectedFiles) {
         boolean onlyEncrypted = true;
 
@@ -150,10 +172,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void openFileInExternalApp(PrivifyFile file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.setData(file.getUri(getApplicationContext()));
+        intent.setData(file.getUri(this));
 
         try {
-            getApplicationContext().startActivity(intent);
+            this.startActivity(intent);
         } catch (ActivityNotFoundException e) {
             this.notificationHelper.toast("Found no app capable of opening the selected file.");
         }
