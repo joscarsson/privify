@@ -53,6 +53,7 @@ public class FileListAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
+        if (this.currentDirectory == null) return;
         this.files = this.currentDirectory.getFiles();
         this.selectedFiles.clear();
         super.notifyDataSetChanged();

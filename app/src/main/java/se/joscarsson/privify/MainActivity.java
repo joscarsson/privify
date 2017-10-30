@@ -84,6 +84,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     protected void onResume() {
         super.onResume();
+        this.listAdapter.notifyDataSetChanged();
 //        this.passphraseCollector.dev();
         this.passphraseCollector.ensurePassphrase();
     }
