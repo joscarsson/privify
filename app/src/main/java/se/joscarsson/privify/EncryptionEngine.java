@@ -29,7 +29,7 @@ class EncryptionEngine {
             private byte[] buffer = new byte[1024*1024];
             private long processedBytes = 0;
             private long totalBytes = 0;
-            private boolean currentIsEncrypted;
+            private boolean decrypting = true;
             private String currentName;
 
             @Override
@@ -39,15 +39,15 @@ class EncryptionEngine {
 
                     for (PrivifyFile file : expandedFiles) {
                         this.totalBytes += file.getSize();
+                        if (!file.isEncrypted()) this.decrypting = false;
                     }
 
                     for (PrivifyFile file : expandedFiles) {
                         this.currentName = file.getName();
-                        this.currentIsEncrypted = file.isEncrypted();
 
-                        if (this.currentIsEncrypted) {
+                        if (this.decrypting && file.isEncrypted()) {
                             decryptFile(file);
-                        } else {
+                        } else if (!this.decrypting && !file.isEncrypted()) {
                             encryptFile(file);
                         }
                     }
@@ -158,7 +158,7 @@ class EncryptionEngine {
             private void updateProgress(int bytesRead) {
                 processedBytes += bytesRead;
                 int progress = (int)(processedBytes * 100 / totalBytes);
-                EncryptionEngine.this.uiHandler.sendProgressUpdate(this.currentIsEncrypted, this.currentName, progress);
+                EncryptionEngine.this.uiHandler.sendProgressUpdate(this.decrypting, this.currentName, progress);
             }
         });
     }

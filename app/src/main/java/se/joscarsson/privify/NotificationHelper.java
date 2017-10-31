@@ -32,13 +32,13 @@ class NotificationHelper {
         this.manager.notify(1, this.builder.build());
     }
 
-    void showProcessing(int progress, boolean isEncrypted, String name) {
+    void showProcessing(int progress, boolean decrypting, String name) {
         this.builder
                 .setProgress(100, progress, false)
                 .setContentTitle(name)
                 .setOngoing(true)
                 .setSmallIcon(R.drawable.ic_lock_white)
-                .setContentText(isEncrypted ? "Decrypting" : "Encrypting");
+                .setContentText(decrypting ? "Decrypting" : "Encrypting");
         this.manager.notify(1, this.builder.build());
     }
 

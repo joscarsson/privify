@@ -39,10 +39,10 @@ public class UserInterfaceHandler extends Handler {
         this.sendEmptyMessage(MESSAGE_WORK_DONE);
     }
 
-    void sendProgressUpdate(boolean isEncrypted, String currentName, int progress) {
+    void sendProgressUpdate(boolean decrypting, String currentName, int progress) {
         Bundle bundle = new Bundle();
         bundle.putString("name", currentName);
-        bundle.putBoolean("isEncrypted", isEncrypted);
+        bundle.putBoolean("decrypting", decrypting);
         bundle.putInt("progress", progress);
         Message message = new Message();
         message.setData(bundle);
@@ -72,9 +72,9 @@ public class UserInterfaceHandler extends Handler {
             this.notificationHelper.showError();
         } else if (msg.what == MESSAGE_PROGRESS_UPDATE) {
             int progress = msg.getData().getInt("progress");
-            boolean isEncrypted = msg.getData().getBoolean("isEncrypted");
+            boolean decrypting = msg.getData().getBoolean("decrypting");
             String name = msg.getData().getString("name");
-            this.notificationHelper.showProcessing(progress, isEncrypted, name);
+            this.notificationHelper.showProcessing(progress, decrypting, name);
         }
     }
 }
