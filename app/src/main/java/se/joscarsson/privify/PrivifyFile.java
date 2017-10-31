@@ -2,6 +2,7 @@ package se.joscarsson.privify;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 
@@ -14,11 +15,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class PrivifyFile implements Comparable<PrivifyFile> {
-    private File nativeFile;
+    static final PrivifyFile ROOT = new PrivifyFile(Environment.getExternalStorageDirectory());
 
-    PrivifyFile(String path) {
-        this.nativeFile = new File(path);
-    }
+    private File nativeFile;
 
     private PrivifyFile(File nativeFile) {
         this.nativeFile = nativeFile;
@@ -69,13 +68,15 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         if (!result && !ignoreError) throw new RuntimeException("Failed to delete file.");
     }
 
-    String getEncryptedPath() {
-        return isEncrypted() ? this.nativeFile.getAbsolutePath() : this.nativeFile.getAbsolutePath() + ".pri";
+    PrivifyFile asEncrypted() {
+        String path = this.nativeFile.getAbsolutePath() + ".pri";
+        return new PrivifyFile(new File(path));
     }
 
-    String getPath() {
+    PrivifyFile asPlain() {
         String path = this.nativeFile.getAbsolutePath();
-        return isEncrypted() ? path.substring(0, path.length() - 4) : path;
+        path = path.substring(0, path.length() - 4);
+        return new PrivifyFile(new File(path));
     }
 
     FileOutputStream getOutputStream() throws FileNotFoundException {

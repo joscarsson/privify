@@ -59,7 +59,7 @@ class EncryptionEngine {
             }
 
             private void encryptFile(PrivifyFile plainFile) throws BadPaddingException {
-                PrivifyFile encryptedFile = new PrivifyFile(plainFile.getEncryptedPath());
+                PrivifyFile encryptedFile = plainFile.asEncrypted();
 
                 try {
                     InputStream inputStream = null;
@@ -96,7 +96,7 @@ class EncryptionEngine {
             }
 
             private void decryptFile(PrivifyFile encryptedFile) throws BadPaddingException {
-                PrivifyFile plainFile = new PrivifyFile(encryptedFile.getPath());
+                PrivifyFile plainFile = encryptedFile.asPlain();
 
                 try {
                     InputStream inputStream = null;

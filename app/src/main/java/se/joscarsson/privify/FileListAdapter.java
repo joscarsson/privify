@@ -30,7 +30,7 @@ public class FileListAdapter extends BaseAdapter {
     }
 
     void openRootDirectory() {
-        this.openDirectory(new PrivifyFile("/sdcard"));
+        this.openDirectory(PrivifyFile.ROOT);
     }
 
     boolean up() {
