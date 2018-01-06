@@ -14,6 +14,7 @@ class PassphraseCollector {
     private Context context;
     private SharedPreferences preferences;
     private String passphrase;
+    private AlertDialog dialog;
 
     PassphraseCollector(View view) {
         this.view = view;
@@ -27,9 +28,11 @@ class PassphraseCollector {
 
     void ensurePassphrase() {
         if (this.passphrase != null) return;
+        if (this.dialog != null && this.dialog.isShowing()) return;
+
         this.view.post(new Runnable() {
             public void run() {
-                AlertDialog popupDialog = new AlertDialog.Builder(PassphraseCollector.this.context)
+                PassphraseCollector.this.dialog = new AlertDialog.Builder(PassphraseCollector.this.context)
                         .setTitle("Input passphrase")
                         .setCancelable(false)
                         .setView(R.layout.passphrase_popup)
@@ -42,7 +45,7 @@ class PassphraseCollector {
                         })
                         .create();
 
-                popupDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                PassphraseCollector.this.dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(final DialogInterface dialog) {
                         Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
@@ -63,7 +66,7 @@ class PassphraseCollector {
                     }
                 });
 
-                popupDialog.show();
+                PassphraseCollector.this.dialog.show();
             }
         });
     }
