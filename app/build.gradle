@@ -7,7 +7,7 @@ android {
         applicationId "se.joscarsson.privify"
         minSdkVersion 23
         targetSdkVersion 26
-        versionCode 5
+        versionCode 6
         versionName "1.0"
     }
     buildTypes {
