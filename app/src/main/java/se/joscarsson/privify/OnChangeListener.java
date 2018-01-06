@@ -2,6 +2,6 @@ package se.joscarsson.privify;
 
 import java.util.List;
 
-public interface OnSelectionChangeListener {
+public interface OnChangeListener {
     void onSelectionChanged(List<PrivifyFile> selectedFiles);
 }

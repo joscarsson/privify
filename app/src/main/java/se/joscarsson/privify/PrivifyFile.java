@@ -53,6 +53,10 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         return this.equals(ROOT.getParent());
     }
 
+    boolean isRoot() {
+        return this.equals(ROOT);
+    }
+
     boolean isDirectory() {
         return this.nativeFile.isDirectory();
     }

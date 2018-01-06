@@ -21,9 +21,9 @@ public class FileListAdapter extends BaseAdapter {
     private List<PrivifyFile> files;
     private Set<PrivifyFile> selectedFiles;
     private PrivifyFile currentDirectory;
-    private OnSelectionChangeListener listener;
+    private OnChangeListener listener;
 
-    FileListAdapter(Context context, OnSelectionChangeListener listener) {
+    FileListAdapter(Context context, OnChangeListener listener) {
         this.context = context;
         this.listener = listener;
         this.selectedFiles = new HashSet<>();
@@ -33,7 +33,7 @@ public class FileListAdapter extends BaseAdapter {
         this.openDirectory(PrivifyFile.ROOT);
     }
 
-    boolean up() {
+    PrivifyFile up() {
         return this.openDirectory(this.currentDirectory.getParent());
     }
 
@@ -43,12 +43,12 @@ public class FileListAdapter extends BaseAdapter {
         return files;
     }
 
-    boolean openDirectory(PrivifyFile directory) {
-        if (directory.isUpFromRoot()) return false;
+    PrivifyFile openDirectory(PrivifyFile directory) {
+        if (directory.isUpFromRoot()) return null;
         this.currentDirectory = directory;
         this.selectedFiles.clear();
         this.notifyDataSetChanged();
-        return true;
+        return directory;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class FileListAdapter extends BaseAdapter {
         View row = convertView;
 
         if (convertView == null) {
-            row = LayoutInflater.from(context).inflate(R.layout.file_row, parent, false);
+            row = LayoutInflater.from(this.context).inflate(R.layout.file_row, parent, false);
         }
 
         final PrivifyFile file = this.files.get(position);
@@ -97,6 +97,8 @@ public class FileListAdapter extends BaseAdapter {
                 } else {
                     FileListAdapter.this.selectedFiles.remove(file);
                 }
+
+                String name = FileListAdapter.this.currentDirectory.getName();
                 FileListAdapter.this.listener.onSelectionChanged(new ArrayList<>(FileListAdapter.this.selectedFiles));
             }
         });

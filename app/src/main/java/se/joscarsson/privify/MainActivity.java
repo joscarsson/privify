@@ -24,7 +24,7 @@ import java.util.List;
 
 import static se.joscarsson.privify.PrivifyApplication.INTENT_LOCK_ACTION;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, OnSelectionChangeListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, OnChangeListener {
     private PassphraseCollector passphraseCollector;
     private EncryptionEngine encryptionEngine;
     private FileListAdapter listAdapter;
@@ -106,6 +106,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (file.isDirectory()) {
             pushScrollPosition();
             this.listAdapter.openDirectory(file);
+            this.setTitle(file.getName());
         } else if (file.isEncrypted()) {
             this.notificationHelper.toast("File is encrypted, decrypt it before opening.");
         } else {
@@ -116,8 +117,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            boolean directoryChanged = this.listAdapter.up();
-            if (directoryChanged) {
+            PrivifyFile newDirectory = this.listAdapter.up();
+            if (newDirectory != null) {
+                if (newDirectory.isRoot()) {
+                    this.setTitle(R.string.app_name);
+                } else {
+                    this.setTitle(newDirectory.getName());
+                }
+
                 popScrollPosition();
                 return true;
             }
