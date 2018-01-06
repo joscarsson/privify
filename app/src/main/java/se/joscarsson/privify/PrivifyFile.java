@@ -49,8 +49,8 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         return FileProvider.getUriForFile(context, authority, this.nativeFile);
     }
 
-    boolean isRoot() {
-        return this.nativeFile.getAbsolutePath().equals("/");
+    boolean isUpFromRoot() {
+        return this.equals(ROOT.getParent());
     }
 
     boolean isDirectory() {
@@ -93,9 +93,9 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
 
     @Override
     public int compareTo(@NonNull PrivifyFile o) {
-        String thisName = this.nativeFile.getName();
-        String otherName = o.nativeFile.getName();
-        return thisName.compareToIgnoreCase(otherName);
+        String thisPath = this.nativeFile.getAbsolutePath();
+        String otherPath = o.nativeFile.getAbsolutePath();
+        return thisPath.compareToIgnoreCase(otherPath);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class FileListAdapter extends BaseAdapter {
     }
 
     boolean openDirectory(PrivifyFile directory) {
-        if (directory.isRoot()) return false;
+        if (directory.isUpFromRoot()) return false;
         this.currentDirectory = directory;
         this.selectedFiles.clear();
         this.notifyDataSetChanged();
