@@ -20,13 +20,13 @@ public abstract class BaseActivity extends AppCompatActivity implements MenuItem
         super.setContentView(layoutResID);
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
 
-        this.drawerLayout = findViewById(R.id.drawerLayout);
+        this.drawerLayout = findViewById(R.id.drawer_layout);
         this.drawerLayout.addDrawerListener(this);
 
         this.drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
         this.drawerToggle.setDrawerIndicatorEnabled(true);
 
-        this.navigationView = findViewById(R.id.navigationView);
+        this.navigationView = findViewById(R.id.navigation_view);
         this.navigationView.getMenu().getItem(0).setOnMenuItemClickListener(this);
         this.navigationView.getMenu().getItem(1).setOnMenuItemClickListener(this);
 
@@ -70,7 +70,7 @@ public abstract class BaseActivity extends AppCompatActivity implements MenuItem
     public void onDrawerClosed(View drawerView) {
         if (this.selectedMenuId == getMenuItemId()) return;
 
-        if (this.selectedMenuId == R.id.settingsMenuItem) {
+        if (this.selectedMenuId == R.id.settings_menu_item) {
             startActivity(new Intent(this, SettingsActivity.class));
         } else {
             startActivity(new Intent(this, MainActivity.class));

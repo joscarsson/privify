@@ -86,7 +86,7 @@ public class FileListAdapter extends BaseAdapter {
         final PrivifyFile file = this.files.get(position);
         row.setTag(file);
 
-        CheckBox actionCheckBox = row.findViewById(R.id.actionCheckBox);
+        CheckBox actionCheckBox = row.findViewById(R.id.action_check_box);
         actionCheckBox.setOnCheckedChangeListener(null);
         actionCheckBox.setChecked(this.selectedFiles.contains(file));
         actionCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -101,10 +101,10 @@ public class FileListAdapter extends BaseAdapter {
             }
         });
 
-        TextView filenameTextView = row.findViewById(R.id.filenameTextView);
+        TextView filenameTextView = row.findViewById(R.id.filename_text_view);
         filenameTextView.setText(file.getName());
 
-        ImageView iconImageView = row.findViewById(R.id.iconImageView);
+        ImageView iconImageView = row.findViewById(R.id.icon_image_view);
         if (file.isDirectory()) {
             iconImageView.setImageResource(R.drawable.ic_folder_open_black);
         } else {

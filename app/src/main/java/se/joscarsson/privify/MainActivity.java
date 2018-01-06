@@ -45,11 +45,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        View view = this.findViewById(R.id.activityMain);
+        View view = this.findViewById(R.id.activity_main);
 
-        this.actionButton = this.findViewById(R.id.actionButton);
-        this.listView = this.findViewById(R.id.fileListView);
-        this.refreshLayout = this.findViewById(R.id.refreshLayout);
+        this.actionButton = this.findViewById(R.id.action_button);
+        this.listView = this.findViewById(R.id.file_list_view);
+        this.refreshLayout = this.findViewById(R.id.refresh_layout);
 
         this.scrollPositions = new ArrayDeque<>();
         this.listAdapter = new FileListAdapter(this, this);
@@ -57,7 +57,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         actionButton.setOnClickListener(this);
         this.listView.setOnItemClickListener(this);
         this.listView.setAdapter(this.listAdapter);
-        this.listView.setEmptyView(this.findViewById(R.id.emptyTextView));
+        this.listView.setEmptyView(this.findViewById(R.id.empty_text_view));
         this.refreshLayout.setOnRefreshListener(this);
 
         boolean hasPermission = ensurePermission();
@@ -163,7 +163,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     protected int getMenuItemId() {
-        return R.id.storageMenuItem;
+        return R.id.storage_menu_item;
     }
 
     private boolean ensurePermission() {

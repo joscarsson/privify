@@ -49,7 +49,7 @@ class PassphraseCollector {
                         button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                EditText passphraseEditText = ((AlertDialog)dialog).findViewById(R.id.passphraseEditText);
+                                EditText passphraseEditText = ((AlertDialog)dialog).findViewById(R.id.passphrase_edit_text);
                                 String passphrase = passphraseEditText.getText().toString();
                                 if (passphrase.length() == 0) {
                                     passphraseEditText.setError("Input passphrase.");

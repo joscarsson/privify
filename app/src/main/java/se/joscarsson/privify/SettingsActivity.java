@@ -20,6 +20,6 @@ public class SettingsActivity extends BaseActivity {
 
     @Override
     protected int getMenuItemId() {
-        return R.id.settingsMenuItem;
+        return R.id.settings_menu_item;
     }
 }
