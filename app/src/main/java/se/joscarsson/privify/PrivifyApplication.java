@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 public class PrivifyApplication extends Application implements Application.ActivityLifecycleCallbacks {
@@ -16,6 +19,12 @@ public class PrivifyApplication extends Application implements Application.Activ
     public void onCreate() {
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                PassphraseActivity.passphrase = null;
+            }
+        }, new IntentFilter(INTENT_LOCK_ACTION));
     }
 
     @Override

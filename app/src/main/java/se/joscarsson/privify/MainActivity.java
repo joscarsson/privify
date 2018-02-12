@@ -25,7 +25,6 @@ import java.util.List;
 import static se.joscarsson.privify.PrivifyApplication.INTENT_LOCK_ACTION;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, OnChangeListener {
-    private PassphraseCollector passphraseCollector;
     private EncryptionEngine encryptionEngine;
     private FileListAdapter listAdapter;
     private NotificationHelper notificationHelper;
@@ -33,19 +32,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private ListView listView;
     private FloatingActionButton actionButton;
     private Deque<Pair<Integer, Integer>> scrollPositions;
-    private BroadcastReceiver lockBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            MainActivity.this.passphraseCollector.clearPassphrase();
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        View view = this.findViewById(R.id.activity_main);
 
         this.actionButton = this.findViewById(R.id.action_button);
         this.listView = this.findViewById(R.id.file_list_view);
@@ -66,19 +57,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         UserInterfaceHandler uiHandler = new UserInterfaceHandler(actionButton, this.listAdapter, notificationHelper);
 
         this.encryptionEngine = new EncryptionEngine(uiHandler);
-        this.passphraseCollector = new PassphraseCollector(view);
 
         if (hasPermission) {
             this.listAdapter.openRootDirectory();
         }
-
-        registerReceiver(this.lockBroadcastReceiver, new IntentFilter(INTENT_LOCK_ACTION));
-    }
-
-    @Override
-    protected void onDestroy() {
-        unregisterReceiver(this.lockBroadcastReceiver);
-        super.onDestroy();
     }
 
     @Override
@@ -86,7 +68,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         super.onResume();
         this.listAdapter.notifyDataSetChanged();
 //        this.passphraseCollector.dev();
-        this.passphraseCollector.ensurePassphrase();
+        PassphraseActivity.ensurePassphrase(this);
     }
 
     @Override
@@ -96,7 +78,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             return;
         }
 
-        this.encryptionEngine.work(this.listAdapter.getSelectedFiles(), passphraseCollector.getPassphrase());
+        this.encryptionEngine.work(this.listAdapter.getSelectedFiles(), PassphraseActivity.passphrase);
     }
 
     @Override
