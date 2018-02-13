@@ -29,10 +29,6 @@ public class FileListAdapter extends BaseAdapter {
         this.selectedFiles = new HashSet<>();
     }
 
-    void openRootDirectory() {
-        this.openDirectory(PrivifyFile.ROOT);
-    }
-
     PrivifyFile up() {
         return this.openDirectory(this.currentDirectory.getParent());
     }
@@ -53,7 +49,7 @@ public class FileListAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        if (this.currentDirectory == null) return;
+        if (this.currentDirectory == null) this.openDirectory(PrivifyFile.ROOT);
         this.files = this.currentDirectory.getFiles();
         this.selectedFiles.clear();
         super.notifyDataSetChanged();

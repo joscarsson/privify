@@ -51,24 +51,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         this.listView.setEmptyView(this.findViewById(R.id.empty_text_view));
         this.refreshLayout.setOnRefreshListener(this);
 
-        boolean hasPermission = ensurePermission();
-
         this.notificationHelper = new NotificationHelper(this);
         UserInterfaceHandler uiHandler = new UserInterfaceHandler(actionButton, this.listAdapter, notificationHelper);
 
         this.encryptionEngine = new EncryptionEngine(uiHandler);
-
-        if (hasPermission) {
-            this.listAdapter.openRootDirectory();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (!PassphraseActivity.ensurePassphrase(this)) return;
+        if (!ensurePermission()) return;
+
         this.listAdapter.notifyDataSetChanged();
-//        this.passphraseCollector.dev();
-        PassphraseActivity.ensurePassphrase(this);
     }
 
     @Override
@@ -147,7 +143,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
         }
 
-        this.listAdapter.openRootDirectory();
+        this.listAdapter.notifyDataSetChanged();
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,13 +17,16 @@ public class PassphraseActivity extends AppCompatActivity implements TextView.On
     static String passphrase;
 
     private EditText passphraseEditText;
+    private EditText passphraseRepeatEditText;
     private SharedPreferences preferences;
+    private boolean passphraseSet;
 
-    static void ensurePassphrase(Activity callee) {
-        if (PassphraseActivity.passphrase != null) return;
+    static boolean ensurePassphrase(Activity callee) {
+        if (PassphraseActivity.passphrase != null) return true;
         Intent intent = new Intent(callee, PassphraseActivity.class);
         callee.startActivity(intent);
         callee.finish();
+        return false;
     }
 
     @Override
@@ -34,35 +38,51 @@ public class PassphraseActivity extends AppCompatActivity implements TextView.On
 
         this.passphraseEditText = findViewById(R.id.passphrase_edit_text);
         this.passphraseEditText.setOnEditorActionListener(this);
+
+        this.passphraseRepeatEditText = findViewById(R.id.passphrase_repeat_edit_text);
+        this.passphraseRepeatEditText.setOnEditorActionListener(this);
+
+        this.passphraseSet = this.preferences.contains("passphrase");
+
+        if (!this.passphraseSet) {
+            this.passphraseEditText.setHint("Choose passphrase");
+            this.passphraseEditText.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+            this.passphraseRepeatEditText.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId != EditorInfo.IME_ACTION_GO) return false;
+        if (actionId != EditorInfo.IME_ACTION_DONE) return false;
 
-        String passphrase = passphraseEditText.getText().toString();
+        String passphrase = this.passphraseEditText.getText().toString();
         if (passphrase.length() == 0) {
-            passphraseEditText.setError("Input passphrase.");
-        } else if (storePassphrase(passphrase)) {
-            Intent intent = new Intent(this, MainActivity.class);
-            this.startActivity(intent);
-            this.finish();
-        } else {
-            passphraseEditText.setError("Wrong passphrase.");
-            passphraseEditText.setText("");
+            this.passphraseEditText.setError("Input passphrase.");
+            return true;
         }
 
+        if (this.passphraseSet && !verifyPassphrase(passphrase)) {
+            this.passphraseEditText.setError("Wrong passphrase.");
+            this.passphraseEditText.setText("");
+            return true;
+        } else if (!this.passphraseSet) {
+            String confirmPassphrase = this.passphraseRepeatEditText.getText().toString();
+            if (!passphrase.equals(confirmPassphrase)) {
+                this.passphraseRepeatEditText.setError("Passphrases do not match.");
+                return true;
+            }
+
+            storePassphrase(passphrase);
+        }
+
+        Intent intent = new Intent(this, MainActivity.class);
+        this.startActivity(intent);
+        this.finish();
         return true;
     }
 
-    private boolean storePassphrase(String passphrase) {
-        String currentHash = this.preferences.getString("passphrase", null);
-        String salt = this.preferences.getString("salt", null);
-        Pair<String, String> newHash = Cryptography.hash(passphrase, salt);
-
-        if (currentHash != null && !currentHash.equals(newHash.first)) {
-            return false;
-        }
+    private void storePassphrase(String passphrase) {
+        Pair<String, String> newHash = Cryptography.hash(passphrase, null);
 
         this.preferences
                 .edit()
@@ -71,7 +91,16 @@ public class PassphraseActivity extends AppCompatActivity implements TextView.On
                 .commit();
 
         PassphraseActivity.passphrase = passphrase;
+    }
 
+    private boolean verifyPassphrase(String passphrase) {
+        String currentHash = this.preferences.getString("passphrase", null);
+        String salt = this.preferences.getString("salt", null);
+        Pair<String, String> newHash = Cryptography.hash(passphrase, salt);
+
+        if (!currentHash.equals(newHash.first)) return false;
+
+        PassphraseActivity.passphrase = passphrase;
         return true;
     }
 }
