@@ -22,7 +22,7 @@ class EncryptionEngine {
         this.uiHandler = uiHandler;
     }
 
-    void work(final List<PrivifyFile> files, final String passphrase) {
+    void work(final List<PrivifyFile> files, final String passphrase, final boolean deletePlainFile, final PrivifyFile targetEncryptDirectory) {
         this.uiHandler.sendWorkBegun();
 
         this.executor.execute(new Runnable() {
@@ -59,7 +59,7 @@ class EncryptionEngine {
             }
 
             private void encryptFile(PrivifyFile plainFile) throws BadPaddingException {
-                PrivifyFile encryptedFile = plainFile.asEncrypted();
+                PrivifyFile encryptedFile = plainFile.asEncrypted(targetEncryptDirectory);
 
                 try {
                     InputStream inputStream = null;
@@ -87,8 +87,10 @@ class EncryptionEngine {
                         if (outputStream != null) outputStream.close();
                     }
 
-                    garbleFile(plainFile);
-                    plainFile.delete();
+                    if (deletePlainFile) {
+                        garbleFile(plainFile);
+                        plainFile.delete();
+                    }
                 } catch (Exception e) {
                     encryptedFile.delete(true);
                     throw new RuntimeException(e);

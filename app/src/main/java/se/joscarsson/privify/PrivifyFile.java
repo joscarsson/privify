@@ -84,8 +84,15 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         if (!result && !ignoreError) throw new RuntimeException("Failed to delete file.");
     }
 
-    PrivifyFile asEncrypted() {
-        String path = this.nativeFile.getAbsolutePath() + ".pri";
+    PrivifyFile asEncrypted(PrivifyFile targetDirectory) {
+        String path;
+
+        if (targetDirectory == null) {
+            path = this.nativeFile.getAbsolutePath() + ".pri";
+        } else {
+            path = targetDirectory.getPath() + File.separator + this.nativeFile.getName() + ".pri";
+        }
+
         return new PrivifyFile(new File(path));
     }
 

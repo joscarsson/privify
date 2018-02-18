@@ -14,16 +14,23 @@ class Settings {
         return Integer.parseInt(preferences(context).getString("auto_lock_delay_minutes", "5"));
     }
 
-    static PrivifyFile getDefaultDirectory(Context context) {
-        String path = preferences(context).getString("default_directory", null);
+    static PrivifyFile getShareTargetDirectory(Context context) {
+        String path = preferences(context).getString("share_target_directory", null);
         if (path == null) return PrivifyFile.ROOT;
         PrivifyFile directory = new PrivifyFile(path);
         if (!directory.exists()) return PrivifyFile.ROOT;
         return directory;
     }
 
-    static void setDefaultDirectory(Context context, PrivifyFile directory) {
-        preferences(context).edit().putString("default_directory", directory.getPath()).commit();
+    static boolean hasShareTargetDirectory(Context context) {
+        String path = preferences(context).getString("share_target_directory", null);
+        if (path == null) return false;
+        PrivifyFile directory = new PrivifyFile(path);
+        return directory.exists();
+    }
+
+    static void setShareTargetDirectory(Context context, PrivifyFile directory) {
+        preferences(context).edit().putString("share_target_directory", directory.getPath()).commit();
     }
 
     private static SharedPreferences preferences(Context context) {

@@ -15,6 +15,20 @@ public abstract class BaseActivity extends AppCompatActivity implements MenuItem
     private NavigationView navigationView;
     private int selectedMenuId;
 
+    protected abstract int getMenuItemId();
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.selectedMenuId = getMenuItemId();
+
+        if (this.selectedMenuId == -1) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        } else {
+            this.navigationView.setCheckedItem(this.selectedMenuId);
+        }
+    }
+
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
@@ -33,20 +47,6 @@ public abstract class BaseActivity extends AppCompatActivity implements MenuItem
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    }
-
-    protected abstract int getMenuItemId();
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        this.selectedMenuId = getMenuItemId();
-
-        if (this.selectedMenuId == -1) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        } else {
-            this.navigationView.setCheckedItem(this.selectedMenuId);
-        }
     }
 
     @Override

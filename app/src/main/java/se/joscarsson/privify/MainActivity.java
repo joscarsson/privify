@@ -2,8 +2,12 @@ package se.joscarsson.privify;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends FileBrowserActivity {
@@ -18,7 +22,37 @@ public class MainActivity extends FileBrowserActivity {
         UserInterfaceHandler uiHandler = new UserInterfaceHandler(this.actionButton, this.listAdapter, notificationHelper);
 
         this.encryptionEngine = new EncryptionEngine(uiHandler);
-        this.listAdapter.setCurrentDirectory(Settings.getDefaultDirectory(this));
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    @Override
+    protected void initialize() {
+        handleShareIntent();
+        super.initialize();
+    }
+
+    private void handleShareIntent() {
+        Intent intent = getIntent();
+
+        if (intent == null) return;
+        if (!Intent.ACTION_SEND.equals(intent.getAction())) return;
+        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return;
+        if (intent.hasExtra("se.joscarsson.privify.Consumed")) return;
+        if (!ensureShareTargetDirectory()) return;
+
+        this.listAdapter.setCurrentDirectory(Settings.getShareTargetDirectory(this));
+
+        Uri uri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+        String path = getFilePathFromUri(uri);
+        final PrivifyFile file = new PrivifyFile(path);
+        this.encryptionEngine.work(new ArrayList<PrivifyFile>() {{ add(file); }}, PassphraseActivity.passphrase, false, Settings.getShareTargetDirectory(this));
+
+        getIntent().putExtra("se.joscarsson.privify.Consumed", true);
     }
 
     @Override
@@ -37,7 +71,7 @@ public class MainActivity extends FileBrowserActivity {
             return;
         }
 
-        this.encryptionEngine.work(this.listAdapter.getSelectedFiles(), PassphraseActivity.passphrase);
+        this.encryptionEngine.work(this.listAdapter.getSelectedFiles(), PassphraseActivity.passphrase, true, null);
     }
 
     @Override
@@ -66,6 +100,20 @@ public class MainActivity extends FileBrowserActivity {
         } else {
             this.actionButton.setImageResource(R.drawable.ic_lock_white);
         }
+    }
+
+    private String getFilePathFromUri(Uri uri) {
+        try (Cursor cursor = getContentResolver().query(uri, new String[] { MediaStore.MediaColumns.DATA }, null, null, null)) {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        }
+    }
+
+    private boolean ensureShareTargetDirectory() {
+        if (Settings.hasShareTargetDirectory(this)) return true;
+        Intent intent = new Intent(this, DirectoryChooserActivity.class);
+        startActivity(intent);
+        return false;
     }
 
     private void openFileInExternalApp(PrivifyFile file) {

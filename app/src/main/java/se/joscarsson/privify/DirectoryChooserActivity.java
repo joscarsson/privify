@@ -24,7 +24,7 @@ public class DirectoryChooserActivity extends FileBrowserActivity {
 
     @Override
     protected void onActionButtonClicked() {
-        Settings.setDefaultDirectory(this, this.listAdapter.getCurrentDirectory());
+        Settings.setShareTargetDirectory(this, this.listAdapter.getCurrentDirectory());
         finish();
     }
 

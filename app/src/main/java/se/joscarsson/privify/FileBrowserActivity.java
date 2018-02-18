@@ -105,7 +105,7 @@ public abstract class FileBrowserActivity extends BaseActivity implements View.O
         }
     }
 
-    private void initialize() {
+    protected void initialize() {
         this.listAdapter.notifyDataSetChanged();
         updateTitle();
     }
