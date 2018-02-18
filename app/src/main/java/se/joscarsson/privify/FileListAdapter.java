@@ -29,7 +29,7 @@ public class FileListAdapter extends BaseAdapter {
         this.listener = listener;
         this.selectedFiles = new HashSet<>();
         this.checkboxesEnabled = true;
-        this.currentDirectory = PrivifyFile.ROOT;
+        this.currentDirectory = ConcretePrivifyFile.ROOT;
     }
 
     void setCheckboxesEnabled(boolean enabled) {

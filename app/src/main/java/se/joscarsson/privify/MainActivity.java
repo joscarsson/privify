@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,25 +35,6 @@ public class MainActivity extends FileBrowserActivity {
     protected void initialize() {
         handleShareIntent();
         super.initialize();
-    }
-
-    private void handleShareIntent() {
-        Intent intent = getIntent();
-
-        if (intent == null) return;
-        if (!Intent.ACTION_SEND.equals(intent.getAction())) return;
-        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return;
-        if (intent.hasExtra("se.joscarsson.privify.Consumed")) return;
-        if (!ensureShareTargetDirectory()) return;
-
-        this.listAdapter.setCurrentDirectory(Settings.getShareTargetDirectory(this));
-
-        Uri uri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
-        String path = getFilePathFromUri(uri);
-        final PrivifyFile file = new PrivifyFile(path);
-        this.encryptionEngine.work(new ArrayList<PrivifyFile>() {{ add(file); }}, PassphraseActivity.passphrase, false, Settings.getShareTargetDirectory(this));
-
-        getIntent().putExtra("se.joscarsson.privify.Consumed", true);
     }
 
     @Override
@@ -102,10 +84,39 @@ public class MainActivity extends FileBrowserActivity {
         }
     }
 
-    private String getFilePathFromUri(Uri uri) {
-        try (Cursor cursor = getContentResolver().query(uri, new String[] { MediaStore.MediaColumns.DATA }, null, null, null)) {
+    private void handleShareIntent() {
+        Intent intent = getIntent();
+
+        if (intent == null) return;
+        if (!Intent.ACTION_SEND.equals(intent.getAction())) return;
+        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return;
+        if (intent.hasExtra("se.joscarsson.privify.Consumed")) return;
+        if (!ensureShareTargetDirectory()) return;
+
+        this.listAdapter.setCurrentDirectory(Settings.getShareTargetDirectory(this));
+
+        Uri uri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+        final PrivifyFile file = getFileFromUri(uri);
+        this.encryptionEngine.work(new ArrayList<PrivifyFile>() {{ add(file); }}, PassphraseActivity.passphrase, false, Settings.getShareTargetDirectory(this));
+
+        getIntent().putExtra("se.joscarsson.privify.Consumed", true);
+    }
+
+    private PrivifyFile getFileFromUri(Uri uri) {
+        String[] requestedFields = new String[] { MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.SIZE };
+        try (Cursor cursor = getContentResolver().query(uri, requestedFields, null, null, null)) {
             cursor.moveToFirst();
-            return cursor.getString(0);
+            String name = cursor.getString(0);
+            String path = cursor.getString(1);
+            int size = cursor.getInt(2);
+
+            if (path != null) {
+                return new ConcretePrivifyFile(path);
+            } else {
+                return new VirtualPrivifyFile(name, size, getContentResolver().openInputStream(uri));
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -16,16 +16,16 @@ class Settings {
 
     static PrivifyFile getShareTargetDirectory(Context context) {
         String path = preferences(context).getString("share_target_directory", null);
-        if (path == null) return PrivifyFile.ROOT;
-        PrivifyFile directory = new PrivifyFile(path);
-        if (!directory.exists()) return PrivifyFile.ROOT;
+        if (path == null) return ConcretePrivifyFile.ROOT;
+        PrivifyFile directory = new ConcretePrivifyFile(path);
+        if (!directory.exists()) return ConcretePrivifyFile.ROOT;
         return directory;
     }
 
     static boolean hasShareTargetDirectory(Context context) {
         String path = preferences(context).getString("share_target_directory", null);
         if (path == null) return false;
-        PrivifyFile directory = new PrivifyFile(path);
+        PrivifyFile directory = new ConcretePrivifyFile(path);
         return directory.exists();
     }
 

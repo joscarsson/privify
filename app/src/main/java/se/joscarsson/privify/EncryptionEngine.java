@@ -35,7 +35,7 @@ class EncryptionEngine {
             @Override
             public void run() {
                 try {
-                    List<PrivifyFile> expandedFiles = PrivifyFile.expandDirectories(files);
+                    List<PrivifyFile> expandedFiles = ConcretePrivifyFile.expandDirectories(files);
 
                     for (PrivifyFile file : expandedFiles) {
                         this.totalBytes += file.getSize();
