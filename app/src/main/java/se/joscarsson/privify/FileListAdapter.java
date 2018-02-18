@@ -41,7 +41,7 @@ public class FileListAdapter extends BaseAdapter {
     }
 
     PrivifyFile up() {
-        return this.openDirectory(this.currentDirectory.getParent());
+        return openDirectory(this.currentDirectory.getParent());
     }
 
     List<PrivifyFile> getSelectedFiles() {
@@ -54,7 +54,7 @@ public class FileListAdapter extends BaseAdapter {
         if (directory.isUpFromRoot()) return null;
         this.currentDirectory = directory;
         this.selectedFiles.clear();
-        this.notifyDataSetChanged();
+        notifyDataSetChanged();
         return directory;
     }
 

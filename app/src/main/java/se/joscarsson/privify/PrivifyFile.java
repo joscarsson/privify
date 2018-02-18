@@ -76,7 +76,7 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
     }
 
     void delete() {
-        this.delete(false);
+        delete(false);
     }
 
     void delete(boolean ignoreError) {
@@ -116,7 +116,7 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof PrivifyFile) return this.compareTo((PrivifyFile)obj) == 0;
+        if (obj instanceof PrivifyFile) return compareTo((PrivifyFile)obj) == 0;
         return super.equals(obj);
     }
 

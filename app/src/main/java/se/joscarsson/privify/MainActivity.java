@@ -74,7 +74,7 @@ public class MainActivity extends FileBrowserActivity {
         intent.setData(file.getUri(this));
 
         try {
-            this.startActivity(intent);
+            startActivity(intent);
         } catch (ActivityNotFoundException e) {
             this.notificationHelper.toast("Found no app capable of opening the selected file.");
         }

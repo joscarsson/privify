@@ -23,7 +23,7 @@ class EncryptionEngine {
     }
 
     void work(final List<PrivifyFile> files, final String passphrase) {
-        uiHandler.sendWorkBegun();
+        this.uiHandler.sendWorkBegun();
 
         this.executor.execute(new Runnable() {
             private byte[] buffer = new byte[1024*1024];

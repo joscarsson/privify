@@ -53,7 +53,7 @@ public abstract class FileBrowserActivity extends BaseActivity implements View.O
         if (!PassphraseActivity.ensurePassphrase(this)) return;
         if (!ensurePermission()) return;
 
-        this.initialize();
+        initialize();
     }
 
     @Override
@@ -84,12 +84,12 @@ public abstract class FileBrowserActivity extends BaseActivity implements View.O
             }
         }
 
-        this.initialize();
+        initialize();
     }
 
     @Override
     public void onClick(View v) {
-        this.onActionButtonClicked();
+        onActionButtonClicked();
     }
 
     @Override
@@ -101,7 +101,7 @@ public abstract class FileBrowserActivity extends BaseActivity implements View.O
             this.listAdapter.openDirectory(file);
             updateTitle();
         } else {
-            this.onFileClicked(file);
+            onFileClicked(file);
         }
     }
 
