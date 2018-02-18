@@ -41,7 +41,12 @@ public abstract class BaseActivity extends AppCompatActivity implements MenuItem
     protected void onResume() {
         super.onResume();
         this.selectedMenuId = getMenuItemId();
-        this.navigationView.setCheckedItem(this.selectedMenuId);
+
+        if (this.selectedMenuId == -1) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        } else {
+            this.navigationView.setCheckedItem(this.selectedMenuId);
+        }
     }
 
     @Override

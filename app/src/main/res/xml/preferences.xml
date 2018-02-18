@@ -13,4 +13,12 @@
         android:singleLine="true"
         android:summary="Number of minutes before auto-lock is engaged. "
         android:title="Auto-lock delay" />
+    <Preference
+        android:key="default_directory"
+        android:title="Default directory"
+        android:summary="The directory to encrypt files to if shared to Privify. The app will also open this directory on start.">
+        <intent
+            android:targetPackage="se.joscarsson.privify"
+            android:targetClass="se.joscarsson.privify.DirectoryChooserActivity" />
+    </Preference>
 </PreferenceScreen>

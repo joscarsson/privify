@@ -22,11 +22,22 @@ public class FileListAdapter extends BaseAdapter {
     private Set<PrivifyFile> selectedFiles;
     private PrivifyFile currentDirectory;
     private OnChangeListener listener;
+    private boolean checkboxesEnabled;
 
     FileListAdapter(Context context, OnChangeListener listener) {
         this.context = context;
         this.listener = listener;
         this.selectedFiles = new HashSet<>();
+        this.checkboxesEnabled = true;
+        this.currentDirectory = PrivifyFile.ROOT;
+    }
+
+    void setCheckboxesEnabled(boolean enabled) {
+        this.checkboxesEnabled = enabled;
+    }
+
+    void setCurrentDirectory(PrivifyFile directory) {
+        this.currentDirectory = directory;
     }
 
     PrivifyFile up() {
@@ -47,9 +58,12 @@ public class FileListAdapter extends BaseAdapter {
         return directory;
     }
 
+    PrivifyFile getCurrentDirectory() {
+        return this.currentDirectory;
+    }
+
     @Override
     public void notifyDataSetChanged() {
-        if (this.currentDirectory == null) this.openDirectory(PrivifyFile.ROOT);
         this.files = this.currentDirectory.getFiles();
         this.selectedFiles.clear();
         super.notifyDataSetChanged();
@@ -83,6 +97,7 @@ public class FileListAdapter extends BaseAdapter {
         row.setTag(file);
 
         CheckBox actionCheckBox = row.findViewById(R.id.action_check_box);
+        actionCheckBox.setEnabled(this.checkboxesEnabled);
         actionCheckBox.setOnCheckedChangeListener(null);
         actionCheckBox.setChecked(this.selectedFiles.contains(file));
         actionCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -94,7 +109,6 @@ public class FileListAdapter extends BaseAdapter {
                     FileListAdapter.this.selectedFiles.remove(file);
                 }
 
-                String name = FileListAdapter.this.currentDirectory.getName();
                 FileListAdapter.this.listener.onSelectionChanged(new ArrayList<>(FileListAdapter.this.selectedFiles));
             }
         });

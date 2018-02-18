@@ -24,6 +24,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
+            android:name=".DirectoryChooserActivity"
+            android:noHistory="true"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+        </activity>
+        <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>

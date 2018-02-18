@@ -23,6 +23,10 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         this.nativeFile = nativeFile;
     }
 
+    PrivifyFile(String path) {
+        this.nativeFile = new File(path);
+    }
+
     List<PrivifyFile> getFiles() {
         File[] nativeFiles = this.nativeFile.listFiles();
         List<PrivifyFile> files = new ArrayList<>();
@@ -44,6 +48,10 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
         return isEncrypted() ? name.substring(0, name.length() - 4) : name;
     }
 
+    String getPath() {
+        return this.nativeFile.getAbsolutePath();
+    }
+
     Uri getUri(Context context) {
         String authority = "se.joscarsson.privify.provider." + context.getPackageName();
         return FileProvider.getUriForFile(context, authority, this.nativeFile);
@@ -62,6 +70,10 @@ public class PrivifyFile implements Comparable<PrivifyFile> {
     }
 
     boolean isEncrypted() { return this.nativeFile.getName().endsWith(".pri"); }
+
+    boolean exists() {
+        return this.nativeFile.exists();
+    }
 
     void delete() {
         this.delete(false);
