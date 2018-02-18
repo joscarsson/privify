@@ -26,6 +26,14 @@ public class MainActivity extends FileBrowserActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_CANCELED) {
+            if (hasShareIntent()) this.notificationHelper.toast("Share to Privify cancelled.");
+            finish();
+        }
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
@@ -84,13 +92,19 @@ public class MainActivity extends FileBrowserActivity {
         }
     }
 
-    private void handleShareIntent() {
+    private boolean hasShareIntent() {
         Intent intent = getIntent();
 
-        if (intent == null) return;
-        if (!Intent.ACTION_SEND.equals(intent.getAction())) return;
-        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return;
-        if (intent.hasExtra("se.joscarsson.privify.Consumed")) return;
+        if (intent == null) return false;
+        if (!Intent.ACTION_SEND.equals(intent.getAction())) return false;
+        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return false;
+        if (intent.hasExtra("se.joscarsson.privify.Consumed")) return false;
+
+        return true;
+    }
+
+    private void handleShareIntent() {
+        if (!hasShareIntent()) return;
         if (!ensureShareTargetDirectory()) return;
 
         this.listAdapter.setCurrentDirectory(Settings.getShareTargetDirectory(this));
@@ -123,7 +137,7 @@ public class MainActivity extends FileBrowserActivity {
     private boolean ensureShareTargetDirectory() {
         if (Settings.hasShareTargetDirectory(this)) return true;
         Intent intent = new Intent(this, DirectoryChooserActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
         return false;
     }
 

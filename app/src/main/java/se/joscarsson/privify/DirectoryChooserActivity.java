@@ -13,6 +13,12 @@ public class DirectoryChooserActivity extends FileBrowserActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        setResult(RESULT_CANCELED);
+        finishAfterTransition();
+    }
+
+    @Override
     public void onSelectionChanged(List<PrivifyFile> selectedFiles) {
         // Checkboxes are disabled, this will never be called in this activity.
     }
@@ -25,7 +31,8 @@ public class DirectoryChooserActivity extends FileBrowserActivity {
     @Override
     protected void onActionButtonClicked() {
         Settings.setShareTargetDirectory(this, this.listAdapter.getCurrentDirectory());
-        finish();
+        setResult(RESULT_OK);
+        finishAfterTransition();
     }
 
     @Override

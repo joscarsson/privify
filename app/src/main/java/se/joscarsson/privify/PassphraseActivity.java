@@ -24,8 +24,15 @@ public class PassphraseActivity extends AppCompatActivity implements TextView.On
     static boolean ensurePassphrase(Activity callee) {
         if (PassphraseActivity.passphrase != null) return true;
         Intent intent = new Intent(callee, PassphraseActivity.class);
-        callee.startActivity(intent);
+        callee.startActivityForResult(intent, 0);
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
+        finishAfterTransition();
     }
 
     @Override
@@ -74,7 +81,8 @@ public class PassphraseActivity extends AppCompatActivity implements TextView.On
             storePassphrase(passphrase);
         }
 
-        finish();
+        setResult(RESULT_OK);
+        finishAfterTransition();
         return true;
     }
 
