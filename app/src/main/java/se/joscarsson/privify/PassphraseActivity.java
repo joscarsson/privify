@@ -25,7 +25,6 @@ public class PassphraseActivity extends AppCompatActivity implements TextView.On
         if (PassphraseActivity.passphrase != null) return true;
         Intent intent = new Intent(callee, PassphraseActivity.class);
         callee.startActivity(intent);
-        callee.finish();
         return false;
     }
 
@@ -75,9 +74,7 @@ public class PassphraseActivity extends AppCompatActivity implements TextView.On
             storePassphrase(passphrase);
         }
 
-        Intent intent = new Intent(this, MainActivity.class);
-        this.startActivity(intent);
-        this.finish();
+        finish();
         return true;
     }
 
