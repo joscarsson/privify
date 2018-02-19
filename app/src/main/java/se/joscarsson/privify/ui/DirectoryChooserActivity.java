@@ -1,8 +1,13 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import java.util.List;
+
+import se.joscarsson.privify.models.PrivifyFile;
+import se.joscarsson.privify.R;
+import se.joscarsson.privify.Settings;
 
 public class DirectoryChooserActivity extends FileBrowserActivity {
     @Override
@@ -14,7 +19,7 @@ public class DirectoryChooserActivity extends FileBrowserActivity {
 
     @Override
     public void onBackPressed() {
-        setResult(RESULT_CANCELED);
+        setResult(Activity.RESULT_CANCELED);
         finishAfterTransition();
     }
 
@@ -31,7 +36,7 @@ public class DirectoryChooserActivity extends FileBrowserActivity {
     @Override
     protected void onActionButtonClicked() {
         Settings.setShareTargetDirectory(this, this.listAdapter.getCurrentDirectory());
-        setResult(RESULT_OK);
+        setResult(Activity.RESULT_OK);
         finishAfterTransition();
     }
 

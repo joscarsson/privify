@@ -6,12 +6,12 @@ import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
-class NotificationHelper {
+public class NotificationHelper {
     private Context context;
     private NotificationManager manager;
     private NotificationCompat.Builder builder;
 
-    NotificationHelper(Context context) {
+    public NotificationHelper(Context context) {
         this.context = context;
         this.manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.builder = new NotificationCompat.Builder(context, "privify_progress");
@@ -23,7 +23,7 @@ class NotificationHelper {
         }
     }
 
-    void showEstimating() {
+    public void showEstimating() {
         this.builder
                 .setProgress(100, 0, true)
                 .setOngoing(true)
@@ -32,7 +32,7 @@ class NotificationHelper {
         this.manager.notify(1, this.builder.build());
     }
 
-    void showProcessing(int progress, boolean decrypting, String name) {
+    public void showProcessing(int progress, boolean decrypting, String name) {
         this.builder
                 .setProgress(100, progress, false)
                 .setContentTitle(name)
@@ -42,7 +42,7 @@ class NotificationHelper {
         this.manager.notify(1, this.builder.build());
     }
 
-    void showError() {
+    public void showError() {
         this.builder
                 .setProgress(0, 0, false)
                 .setOngoing(false)
@@ -51,11 +51,11 @@ class NotificationHelper {
         this.manager.notify(1, this.builder.build());
     }
 
-    void hide() {
+    public void hide() {
         this.manager.cancel(1);
     }
 
-    void toast(String text) {
+    public void toast(String text) {
         Toast.makeText(this.context, text, Toast.LENGTH_SHORT).show();
     }
 }

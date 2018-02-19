@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.ui;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+
+import se.joscarsson.privify.R;
 
 public abstract class BaseActivity extends AppCompatActivity implements MenuItem.OnMenuItemClickListener, DrawerLayout.DrawerListener {
     protected ActionBarDrawerToggle drawerToggle;

@@ -20,7 +20,7 @@
             app:titleTextColor="@color/primaryTextColor" />
         <fragment
             android:id="@+id/settingsFragment"
-            android:name="se.joscarsson.privify.SettingsFragment"
+            android:name="se.joscarsson.privify.ui.SettingsFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

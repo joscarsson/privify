@@ -10,8 +10,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
+import se.joscarsson.privify.ui.BaseActivity;
+import se.joscarsson.privify.ui.PassphraseActivity;
+
 public class PrivifyApplication extends Application implements Application.ActivityLifecycleCallbacks {
-    static final String INTENT_LOCK_ACTION = BaseActivity.class.getName() + ".lock";
+    public static final String INTENT_LOCK_ACTION = BaseActivity.class.getName() + ".lock";
 
     private PendingIntent lockIntent;
 

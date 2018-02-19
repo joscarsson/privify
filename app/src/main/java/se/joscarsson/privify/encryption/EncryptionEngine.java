@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.encryption;
 
 import android.util.Pair;
 
@@ -14,15 +14,19 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 
-class EncryptionEngine {
+import se.joscarsson.privify.models.ConcretePrivifyFile;
+import se.joscarsson.privify.models.PrivifyFile;
+import se.joscarsson.privify.ui.UserInterfaceHandler;
+
+public class EncryptionEngine {
     private Executor executor = Executors.newSingleThreadExecutor();
     private UserInterfaceHandler uiHandler;
 
-    EncryptionEngine(UserInterfaceHandler uiHandler) {
+    public EncryptionEngine(UserInterfaceHandler uiHandler) {
         this.uiHandler = uiHandler;
     }
 
-    void work(final List<PrivifyFile> files, final String passphrase, final boolean deletePlainFile, final PrivifyFile targetEncryptDirectory) {
+    public void work(final List<PrivifyFile> files, final String passphrase, final boolean deletePlainFile, final PrivifyFile targetEncryptDirectory) {
         this.uiHandler.sendWorkBegun();
 
         this.executor.execute(new Runnable() {

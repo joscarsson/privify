@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.ui;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -6,6 +6,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.widget.BaseAdapter;
+
+import se.joscarsson.privify.NotificationHelper;
+import se.joscarsson.privify.R;
 
 public class UserInterfaceHandler extends Handler {
     private static final int MESSAGE_WORK_BEGUN = 1;
@@ -25,16 +28,16 @@ public class UserInterfaceHandler extends Handler {
         this.notificationHelper = notificationHelper;
     }
 
-    void sendWorkBegun() {
+    public void sendWorkBegun() {
         sendEmptyMessage(MESSAGE_WORK_BEGUN);
 
     }
 
-    void sendWorkDone() {
+    public void sendWorkDone() {
         sendEmptyMessage(MESSAGE_WORK_DONE);
     }
 
-    void sendProgressUpdate(boolean decrypting, String currentName, int progress) {
+    public void sendProgressUpdate(boolean decrypting, String currentName, int progress) {
         Bundle bundle = new Bundle();
         bundle.putString("name", currentName);
         bundle.putBoolean("decrypting", decrypting);
@@ -45,7 +48,7 @@ public class UserInterfaceHandler extends Handler {
         sendMessage(message);
     }
 
-    void sendWorkError() {
+    public void sendWorkError() {
         sendEmptyMessage(MESSAGE_WORK_ERROR);
     }
 

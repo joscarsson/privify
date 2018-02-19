@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.models;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-interface PrivifyFile extends Comparable<PrivifyFile> {
+public interface PrivifyFile extends Comparable<PrivifyFile> {
     List<PrivifyFile> getFiles();
     PrivifyFile getParent();
     String getName();

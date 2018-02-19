@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.encryption;
 
 import android.util.Pair;
 
@@ -15,13 +15,13 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-class Cryptography {
+public class Cryptography {
     private static final int ITERATION_MULTIPLIER = 10;
     private static final int KEY_LENGTH = 256;
     private static final int SALT_LENGTH = KEY_LENGTH / 8;
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    static Pair<String, String> hash(String value, String hexSalt)
+    public static Pair<String, String> hash(String value, String hexSalt)
     {
         try {
             byte[] salt = new byte[16];

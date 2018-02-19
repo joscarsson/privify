@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.models;
 
 
 import android.content.Context;
@@ -16,7 +16,7 @@ public class VirtualPrivifyFile implements PrivifyFile {
     private int size;
     private InputStream inputStream;
 
-    VirtualPrivifyFile(String name, int size, InputStream inputStream) {
+    public VirtualPrivifyFile(String name, int size, InputStream inputStream) {
         this.name = name;
         this.size = size;
         this.inputStream = inputStream;

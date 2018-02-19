@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.models;
 
 import android.content.Context;
 import android.net.Uri;
@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConcretePrivifyFile implements PrivifyFile {
-    static final PrivifyFile ROOT = new ConcretePrivifyFile(Environment.getExternalStorageDirectory());
+    public static final PrivifyFile ROOT = new ConcretePrivifyFile(Environment.getExternalStorageDirectory());
 
     private File nativeFile;
 
@@ -25,7 +25,7 @@ public class ConcretePrivifyFile implements PrivifyFile {
         this.nativeFile = nativeFile;
     }
 
-    ConcretePrivifyFile(String path) {
+    public ConcretePrivifyFile(String path) {
         this.nativeFile = new File(path);
     }
 
@@ -149,7 +149,7 @@ public class ConcretePrivifyFile implements PrivifyFile {
         return this.nativeFile.hashCode();
     }
 
-    static List<PrivifyFile> expandDirectories(List<PrivifyFile> files) {
+    public static List<PrivifyFile> expandDirectories(List<PrivifyFile> files) {
         List<PrivifyFile> expandedFiles = new ArrayList<>();
 
         for (final PrivifyFile file : files) {

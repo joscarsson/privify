@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:launchMode="singleTask"
             android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
@@ -26,17 +26,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PassphraseActivity"
+            android:name=".ui.PassphraseActivity"
             android:noHistory="true"
             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
-            android:name=".DirectoryChooserActivity"
+            android:name=".ui.DirectoryChooserActivity"
             android:noHistory="true"
             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <provider

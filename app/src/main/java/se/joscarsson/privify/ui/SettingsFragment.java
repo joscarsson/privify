@@ -1,7 +1,9 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.ui;
 
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceFragmentCompat;
+
+import se.joscarsson.privify.R;
 
 import static se.joscarsson.privify.Settings.PREFERENCES_NAME;
 

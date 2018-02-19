@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -16,7 +16,12 @@ import android.widget.ListView;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public abstract class FileBrowserActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, OnChangeListener  {
+import se.joscarsson.privify.models.FileListAdapter;
+import se.joscarsson.privify.models.OnChangeListener;
+import se.joscarsson.privify.R;
+import se.joscarsson.privify.models.PrivifyFile;
+
+public abstract class FileBrowserActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, OnChangeListener {
     protected FloatingActionButton actionButton;
     protected FileListAdapter listAdapter;
     private SwipeRefreshLayout refreshLayout;

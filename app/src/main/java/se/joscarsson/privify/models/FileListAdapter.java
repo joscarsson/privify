@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.models;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import se.joscarsson.privify.R;
+
 public class FileListAdapter extends BaseAdapter {
     private Context context;
     private List<PrivifyFile> files;
@@ -24,7 +26,7 @@ public class FileListAdapter extends BaseAdapter {
     private OnChangeListener listener;
     private boolean checkboxesEnabled;
 
-    FileListAdapter(Context context, OnChangeListener listener) {
+    public FileListAdapter(Context context, OnChangeListener listener) {
         this.context = context;
         this.listener = listener;
         this.selectedFiles = new HashSet<>();
@@ -32,25 +34,25 @@ public class FileListAdapter extends BaseAdapter {
         this.currentDirectory = ConcretePrivifyFile.ROOT;
     }
 
-    void setCheckboxesEnabled(boolean enabled) {
+    public void setCheckboxesEnabled(boolean enabled) {
         this.checkboxesEnabled = enabled;
     }
 
-    void setCurrentDirectory(PrivifyFile directory) {
+    public void setCurrentDirectory(PrivifyFile directory) {
         this.currentDirectory = directory;
     }
 
-    PrivifyFile up() {
+    public PrivifyFile up() {
         return openDirectory(this.currentDirectory.getParent());
     }
 
-    List<PrivifyFile> getSelectedFiles() {
+    public List<PrivifyFile> getSelectedFiles() {
         List<PrivifyFile> files = new ArrayList<>(this.selectedFiles);
         Collections.sort(files);
         return files;
     }
 
-    PrivifyFile openDirectory(PrivifyFile directory) {
+    public PrivifyFile openDirectory(PrivifyFile directory) {
         if (directory.isUpFromRoot()) return null;
         this.currentDirectory = directory;
         this.selectedFiles.clear();
@@ -58,7 +60,7 @@ public class FileListAdapter extends BaseAdapter {
         return directory;
     }
 
-    PrivifyFile getCurrentDirectory() {
+    public PrivifyFile getCurrentDirectory() {
         return this.currentDirectory;
     }
 

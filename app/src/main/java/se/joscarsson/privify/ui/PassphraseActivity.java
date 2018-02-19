@@ -1,4 +1,4 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,8 +13,11 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import se.joscarsson.privify.encryption.Cryptography;
+import se.joscarsson.privify.R;
+
 public class PassphraseActivity extends AppCompatActivity implements TextView.OnEditorActionListener {
-    static String passphrase;
+    public static String passphrase;
 
     private EditText passphraseEditText;
     private EditText passphraseRepeatEditText;

@@ -1,5 +1,6 @@
-package se.joscarsson.privify;
+package se.joscarsson.privify.ui;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,6 +11,14 @@ import android.provider.MediaStore;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+
+import se.joscarsson.privify.models.ConcretePrivifyFile;
+import se.joscarsson.privify.encryption.EncryptionEngine;
+import se.joscarsson.privify.NotificationHelper;
+import se.joscarsson.privify.models.PrivifyFile;
+import se.joscarsson.privify.R;
+import se.joscarsson.privify.Settings;
+import se.joscarsson.privify.models.VirtualPrivifyFile;
 
 public class MainActivity extends FileBrowserActivity {
     private EncryptionEngine encryptionEngine;
@@ -27,7 +36,7 @@ public class MainActivity extends FileBrowserActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_CANCELED) {
+        if (resultCode == Activity.RESULT_CANCELED) {
             if (hasShareIntent()) this.notificationHelper.toast("Share to Privify cancelled.");
             finish();
         }
